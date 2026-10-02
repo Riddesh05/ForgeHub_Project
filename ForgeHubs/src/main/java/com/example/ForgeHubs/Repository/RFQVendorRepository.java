@@ -1,0 +1,33 @@
+package com.example.ForgeHubs.Repository;
+
+import com.example.ForgeHubs.Entity.RFQ;
+import com.example.ForgeHubs.Entity.RFQVendor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface RFQVendorRepository extends JpaRepository<RFQVendor, Integer> {
+
+    @Modifying
+    @Query("DELETE FROM RFQVendor rv WHERE rv.rfq = :rfq")
+    void deleteByRfq(@Param("rfq") RFQ rfq);
+
+    @Query("""
+            SELECT rv.rfq
+            FROM RFQVendor rv
+            WHERE rv.vendor.userId = :vendorId
+              AND rv.rfq.isDeleted = false
+              AND rv.rfq.status IN (com.example.ForgeHubs.enums.RFQStatus.OPEN,
+                                    com.example.ForgeHubs.enums.RFQStatus.REOPENED)
+            ORDER BY rv.rfq.rfqId DESC
+            """)
+    List<RFQ> findActiveAssignedRfqs(@Param("vendorId") Integer vendorId);
+
+    boolean existsByRfq_RfqIdAndVendor_UserId(Integer rfqId, Integer vendorId);
+
+    Optional<RFQVendor> findByRfq_RfqIdAndVendor_UserId(Integer rfqId, Integer vendorId);
+}
