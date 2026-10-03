@@ -4,41 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7184a611-18b4-4cb0-8415-ca86e731d2b9" name="Changes" comment="commits">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminSectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminSectionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminUserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/VendorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/VendorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/RFQCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/RFQCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/UserCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/UserCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/UserRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/UserRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationItemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationItemRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/FinalizedQuotation.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/FinalizedQuotation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQ.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQ.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQQuotation.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQQuotation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQVendor.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/RFQVendor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/FinalizedQuotationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/FinalizedQuotationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/RFQQuotationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/RFQQuotationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/RFQVendorRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/RFQVendorRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/RFQService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/RFQService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/VendorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/VendorService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/VendorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/VendorServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/add-rfq.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/add-rfq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/rfq-view.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/rfq-view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/users.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/users.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/vendor-quotation.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/admin/vendor-quotation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/fragments/vendor-sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/fragments/vendor-sidebar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/finalized-quotation.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/finalized-quotation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/my-submission.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/my-submission.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/open-rfq.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/open-rfq.html" afterDir="false" />
-    </list>
+    <list default="true" id="7184a611-18b4-4cb0-8415-ca86e731d2b9" name="Changes" comment="commits" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -217,7 +183,23 @@
       <option name="project" value="LOCAL" />
       <updated>1791026561995</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="commits">
+      <option name="closed" value="true" />
+      <created>1791034097283</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1791034097283</updated>
+    </task>
+    <task id="LOCAL-00010" summary="commits">
+      <option name="closed" value="true" />
+      <created>1791034116511</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1791034116511</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
