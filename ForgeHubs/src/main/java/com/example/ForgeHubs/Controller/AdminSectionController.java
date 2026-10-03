@@ -1,6 +1,6 @@
 package com.example.ForgeHubs.Controller;
 
-import com.example.ForgeHubs.DTO.UserCreateRequest;
+import com.example.ForgeHubs.DTO.UserRequestDto;
 import com.example.ForgeHubs.Entity.RFQQuotation;
 import com.example.ForgeHubs.Service.UserService;
 import com.example.ForgeHubs.Service.VendorService;
@@ -46,7 +46,7 @@ public class AdminSectionController {
     @GetMapping("/vendor-quotation/details/{quotationId}")
     @ResponseBody
     public ResponseEntity<VendorQuotationDetailsResponse> vendorQuotationDetails(
-            @PathVariable Integer quotationId
+            @PathVariable Long quotationId
     ) {
         RFQQuotation quotation = vendorService.getQuotationForAdmin(quotationId);
         return ResponseEntity.ok(toDetailsResponse(quotation));
@@ -54,7 +54,7 @@ public class AdminSectionController {
 
     @PostMapping("/vendor-quotation/finalize/{quotationId}")
     public String finalizeVendorQuotation(
-            @PathVariable Integer quotationId,
+            @PathVariable Long quotationId,
             RedirectAttributes redirectAttributes
     ) {
         try {
@@ -125,7 +125,7 @@ public class AdminSectionController {
                 quotation.getQuotationId(),
                 quotation.getBidNo(),
                 quotation.getRfq() != null ? quotation.getRfq().getRfqNo() : "-",
-                quotation.getVendor() != null ? quotation.getVendor().getFullName() : "-",
+                quotation.getVendor() != null ? quotation.getVendor().getName() : "-",
                 quotation.getVendor() != null ? quotation.getVendor().getEmail() : "-",
                 grandTotal,
                 subtotal,
@@ -147,13 +147,13 @@ public class AdminSectionController {
 
     @GetMapping("/users")
     public String users(Model model) {
-        model.addAttribute("userRequest", new UserCreateRequest());
+        model.addAttribute("userRequest", new UserRequestDto());
         model.addAttribute("users", userService.getAllUsers());
         return "admin/users";
     }
 
     public record VendorQuotationDetailsResponse(
-            Integer quotationId,
+            Long quotationId,
             String bidNo,
             String rfqNo,
             String vendorName,

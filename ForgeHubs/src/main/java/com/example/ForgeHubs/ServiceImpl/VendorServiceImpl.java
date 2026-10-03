@@ -1,4 +1,4 @@
-package com.example.ForgeHubs.ServiceImpl;
+        package com.example.ForgeHubs.ServiceImpl;
 
 import com.example.ForgeHubs.DTO.VendorQuotationItemRequest;
 import com.example.ForgeHubs.DTO.VendorQuotationRequest;
@@ -43,12 +43,12 @@ public class VendorServiceImpl implements VendorService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public User getVendor(Integer vendorId) {
+    public User getVendor(Long vendorId) {
         User vendor = userRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found: " + vendorId));
 
         if (vendor.getRole() != UserRole.VENDOR) {
-            throw new RuntimeException("Selected user is not a vendor: " + vendor.getFullName());
+            throw new RuntimeException("Selected user is not a vendor: " + vendor.getName());
         }
 
         return vendor;
@@ -56,7 +56,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQ> getOpenRfqs(Integer vendorId) {
+    public List<RFQ> getOpenRfqs(Long vendorId) {
         getVendor(vendorId);
 
         List<RFQ> rfqs = rfqVendorRepository.findActiveAssignedRfqs(vendorId);
@@ -72,6 +72,7 @@ public class VendorServiceImpl implements VendorService {
             if (rfq.getItems() != null) {
                 rfq.getItems().size();
             }
+
             result.add(rfq);
         }
 
@@ -80,7 +81,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public RFQ getAssignedRfq(Integer rfqId, Integer vendorId) {
+    public RFQ getAssignedRfq(Long rfqId, Long vendorId) {
         getVendor(vendorId);
 
         if (!rfqVendorRepository.existsByRfq_RfqIdAndVendor_UserId(rfqId, vendorId)) {
@@ -106,8 +107,8 @@ public class VendorServiceImpl implements VendorService {
     @Override
     @Transactional
     public void submitQuotation(
-            Integer rfqId,
-            Integer vendorId,
+            Long rfqId,
+            Long vendorId,
             VendorQuotationRequest request
     ) {
         User vendor = getVendor(vendorId);
@@ -126,7 +127,7 @@ public class VendorServiceImpl implements VendorService {
             throw new RuntimeException("Quotation must contain at least one item");
         }
 
-        Map<Integer, RFQItem> rfqItems = new LinkedHashMap<>();
+        Map<Long, RFQItem> rfqItems = new LinkedHashMap<>();
         for (RFQItem item : rfq.getItems()) {
             rfqItems.put(item.getItemId(), item);
         }
@@ -136,18 +137,28 @@ public class VendorServiceImpl implements VendorService {
 
         for (VendorQuotationItemRequest itemRequest : request.getItems()) {
             RFQItem item = rfqItems.get(itemRequest.getItemId());
+
             if (item == null) {
                 throw new RuntimeException("Invalid RFQ item selected: " + itemRequest.getItemId());
             }
 
-            int availableQty = itemRequest.getAvailableQty() == null ? 0 : itemRequest.getAvailableQty();
-            if (availableQty < 0 || (item.getReqQty() != null && availableQty > item.getReqQty())) {
-                throw new RuntimeException("Available quantity is invalid for item: " + item.getItemName());
+            int availableQty = itemRequest.getAvailableQty() == null
+                    ? 0
+                    : itemRequest.getAvailableQty();
+
+            if (availableQty < 0
+                    || (item.getReqQty() != null && availableQty > item.getReqQty())) {
+                throw new RuntimeException(
+                        "Available quantity is invalid for item: " + item.getItemName()
+                );
             }
 
             BigDecimal unitPrice = itemRequest.getUnitPrice();
+
             if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                throw new RuntimeException("Unit price is invalid for item: " + item.getItemName());
+                throw new RuntimeException(
+                        "Unit price is invalid for item: " + item.getItemName()
+                );
             }
 
             BigDecimal otherCharges = itemRequest.getOtherCharges() == null
@@ -155,7 +166,9 @@ public class VendorServiceImpl implements VendorService {
                     : itemRequest.getOtherCharges();
 
             if (otherCharges.compareTo(BigDecimal.ZERO) < 0) {
-                throw new RuntimeException("Other charges cannot be negative for item: " + item.getItemName());
+                throw new RuntimeException(
+                        "Other charges cannot be negative for item: " + item.getItemName()
+                );
             }
 
             BigDecimal itemSubtotal = unitPrice
@@ -178,11 +191,17 @@ public class VendorServiceImpl implements VendorService {
             line.put("otherCharges", otherCharges);
             line.put("itemSubtotal", itemSubtotal);
             line.put("subtotal", lineSubtotal);
+
             quotationItems.add(line);
         }
 
-        BigDecimal gst = subtotal.multiply(GST_RATE).setScale(4, RoundingMode.HALF_UP);
-        BigDecimal grandTotal = subtotal.add(gst).setScale(4, RoundingMode.HALF_UP);
+        BigDecimal gst = subtotal
+                .multiply(GST_RATE)
+                .setScale(4, RoundingMode.HALF_UP);
+
+        BigDecimal grandTotal = subtotal
+                .add(gst)
+                .setScale(4, RoundingMode.HALF_UP);
 
         Map<String, Object> storedDetails = new LinkedHashMap<>();
         storedDetails.put("gstRate", 10);
@@ -193,8 +212,10 @@ public class VendorServiceImpl implements VendorService {
         storedDetails.put("remarks", request.getRemarks());
 
         String detailsJson;
+
         try {
-            detailsJson = QUOTATION_JSON_PREFIX + objectMapper.writeValueAsString(storedDetails);
+            detailsJson = QUOTATION_JSON_PREFIX
+                    + objectMapper.writeValueAsString(storedDetails);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to prepare quotation details", e);
         }
@@ -208,6 +229,7 @@ public class VendorServiceImpl implements VendorService {
                         ? quotation.getBidNo()
                         : "BID-" + rfq.getRfqNo() + "-V" + vendorId
         );
+
         quotation.setQuotedAmount(grandTotal);
         quotation.setDeliveryDate(request.getDeliveryDate());
         quotation.setPaymentTerms(request.getPaymentTerms());
@@ -222,15 +244,17 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQQuotation> getMySubmissions(Integer vendorId) {
+    public List<RFQQuotation> getMySubmissions(Long vendorId) {
         getVendor(vendorId);
-        return rfqQuotationRepository.findByVendor_UserIdOrderBySubmittedDateDesc(vendorId);
+        return rfqQuotationRepository
+                .findByVendor_UserIdOrderBySubmittedDateDesc(vendorId);
     }
 
     @Override
     @Transactional
-    public RFQQuotation getMySubmission(Integer quotationId, Integer vendorId) {
+    public RFQQuotation getMySubmission(Long quotationId, Long vendorId) {
         getVendor(vendorId);
+
         RFQQuotation quotation = rfqQuotationRepository
                 .findByQuotationIdAndVendor_UserId(quotationId, vendorId)
                 .orElseThrow(() -> new RuntimeException("Quotation not found"));
@@ -244,15 +268,18 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<FinalizedQuotation> getFinalizedQuotations(Integer vendorId) {
+    public List<FinalizedQuotation> getFinalizedQuotations(Long vendorId) {
         getVendor(vendorId);
-        List<FinalizedQuotation> finalized = finalizedQuotationRepository
-                .findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(vendorId);
+
+        List<FinalizedQuotation> finalized =
+                finalizedQuotationRepository
+                        .findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(vendorId);
 
         finalized.forEach(item -> {
             if (item.getRfq() != null && item.getRfq().getItems() != null) {
                 item.getRfq().getItems().size();
             }
+
             if (item.getQuotation() != null) {
                 item.getQuotation().getQuotedAmount();
                 item.getQuotation().getBidNo();
@@ -276,6 +303,7 @@ public class VendorServiceImpl implements VendorService {
             if (quotation.getRfq() != null && quotation.getRfq().getItems() != null) {
                 quotation.getRfq().getItems().size();
             }
+
             if (quotation.getVendor() != null) {
                 quotation.getVendor().getUserId();
             }
@@ -286,8 +314,9 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public RFQQuotation getQuotationForAdmin(Integer quotationId) {
-        RFQQuotation quotation = rfqQuotationRepository.findById(quotationId)
+    public RFQQuotation getQuotationForAdmin(Long quotationId) {
+        RFQQuotation quotation = rfqQuotationRepository
+                .findById(quotationId)
                 .orElseThrow(() -> new RuntimeException(
                         "Vendor quotation not found: " + quotationId
                 ));
@@ -295,6 +324,7 @@ public class VendorServiceImpl implements VendorService {
         if (quotation.getRfq() != null && quotation.getRfq().getItems() != null) {
             quotation.getRfq().getItems().size();
         }
+
         if (quotation.getVendor() != null) {
             quotation.getVendor().getUserId();
         }
@@ -304,7 +334,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public void finalizeQuotation(Integer quotationId) {
+    public void finalizeQuotation(Long quotationId) {
         RFQQuotation quotation = getQuotationForAdmin(quotationId);
 
         if (finalizedQuotationRepository
@@ -314,6 +344,7 @@ public class VendorServiceImpl implements VendorService {
         }
 
         RFQ rfq = quotation.getRfq();
+
         if (rfq == null) {
             throw new RuntimeException("Quotation is not linked to an RFQ.");
         }
@@ -333,5 +364,4 @@ public class VendorServiceImpl implements VendorService {
         rfqQuotationRepository.save(quotation);
         finalizedQuotationRepository.save(finalized);
     }
-
 }

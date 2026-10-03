@@ -18,7 +18,7 @@ public class RFQQuotation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "QuotationId")
-    private Integer quotationId;
+    private Long quotationId;
 
     @Column(
             name = "BidNo",

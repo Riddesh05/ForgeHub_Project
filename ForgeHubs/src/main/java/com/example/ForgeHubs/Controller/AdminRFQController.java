@@ -21,7 +21,7 @@ public class AdminRFQController {
     private final RFQService rfqService;
 
     // Temporary admin ID until authentication branch is merged.
-    private static final Integer TEST_ADMIN_ID = 1;
+    private static final Long TEST_ADMIN_ID = 1L;
 
     // =========================================================
     // ADD RFQ
@@ -194,7 +194,7 @@ public class AdminRFQController {
     // =========================================================
 
     public record RFQDetailsResponse(
-            Integer rfqId,
+            Long rfqId,
             String rfqNo,
             String indentNo,
             String contactPerson,
@@ -208,7 +208,7 @@ public class AdminRFQController {
     }
 
     public record RFQItemResponse(
-            Integer itemId,
+            Long itemId,
             Integer rfqLineNo,
             String itemNo,
             String itemName,

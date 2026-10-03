@@ -11,26 +11,26 @@ import java.util.List;
 
 public interface VendorService {
 
-    User getVendor(Integer vendorId);
+    User getVendor(Long vendorId);
 
-    List<RFQ> getOpenRfqs(Integer vendorId);
+    List<RFQ> getOpenRfqs(Long vendorId);
 
-    RFQ getAssignedRfq(Integer rfqId, Integer vendorId);
+    RFQ getAssignedRfq(Long rfqId, Long vendorId);
 
-    void submitQuotation(Integer rfqId, Integer vendorId, VendorQuotationRequest request);
+    void submitQuotation(Long rfqId, Long vendorId, VendorQuotationRequest request);
 
-    List<RFQQuotation> getMySubmissions(Integer vendorId);
+    List<RFQQuotation> getMySubmissions(Long vendorId);
 
-    RFQQuotation getMySubmission(Integer quotationId, Integer vendorId);
+    RFQQuotation getMySubmission(Long quotationId, Long vendorId);
 
-    List<FinalizedQuotation> getFinalizedQuotations(Integer vendorId);
+    List<FinalizedQuotation> getFinalizedQuotations(Long vendorId);
 
     // Admin-side quotation flow
     List<RFQQuotation> getAllVendorQuotations();
 
-    RFQQuotation getQuotationForAdmin(Integer quotationId);
+    RFQQuotation getQuotationForAdmin(Long quotationId);
 
-    void finalizeQuotation(Integer quotationId);
+    void finalizeQuotation(Long quotationId);
 
 
 //    List<VendorQuotationHistory> getQuotationHistory(

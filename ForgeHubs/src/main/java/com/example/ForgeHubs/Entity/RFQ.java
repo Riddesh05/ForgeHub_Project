@@ -22,7 +22,7 @@ public class RFQ {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RFQId")
-    private Integer rfqId;
+    private Long rfqId;
 
     @Column(name = "RFQNo", nullable = false, columnDefinition = "LONGTEXT")
     private String rfqNo;

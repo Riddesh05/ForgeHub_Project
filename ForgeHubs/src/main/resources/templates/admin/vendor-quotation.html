@@ -54,7 +54,7 @@
                             <td class="fw-semibold text-primary" th:text="${quotation.rfq.rfqNo}">RFQ-000001</td>
                             <td th:text="${quotation.bidNo}">BID-...</td>
                             <td>
-                                <div class="fw-semibold" th:text="${quotation.vendor.fullName}">Vendor</div>
+                                <div class="fw-semibold" th:text="${quotation.vendor.name}">Vendor</div>
                                 <small class="text-muted" th:text="${quotation.vendor.email}">vendor@email.com</small>
                             </td>
                             <td class="fw-semibold">₹ <span th:text="${#numbers.formatDecimal(quotation.quotedAmount, 1, 2)}">0.00</span></td>

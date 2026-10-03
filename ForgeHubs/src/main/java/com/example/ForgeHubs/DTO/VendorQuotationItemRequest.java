@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VendorQuotationItemRequest {
-    private Integer itemId;
+    private Long itemId;
     private Integer availableQty;
     private BigDecimal unitPrice;
     private BigDecimal otherCharges;

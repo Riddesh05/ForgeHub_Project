@@ -1,7 +1,6 @@
 package com.example.ForgeHubs.ServiceImpl;
 
 
-import com.example.ForgeHubs.DTO.UserCreateRequest;
 import com.example.ForgeHubs.DTO.UserRequestDto;
 import com.example.ForgeHubs.DTO.UserResponseDto;
 import com.example.ForgeHubs.Entity.User;
@@ -20,6 +19,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
   //  private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void createVendor(UserCreateRequest request) {
+    public void createVendor(UserRequestDto request) {
 
         // Duplicate email check
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -53,11 +53,14 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
 
-        user.setFullName(request.getFullName());
+
+
+
+        user.setName(request.getName());
         user.setEmail(request.getEmail());
 
         // Temporary password must be stored as hash
-        user.setPasswordHash(request.getTemporaryPassword());
+        user.setPassword(request.getPassword());
 
         // IMPORTANT:
         // Admin can ONLY create VENDOR

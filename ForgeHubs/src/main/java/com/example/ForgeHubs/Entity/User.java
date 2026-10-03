@@ -50,14 +50,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UserId")
-    private Integer userId;
+    private Long userId;
 
     @Column(
             name = "FullName",
             nullable = false,
             columnDefinition = "LONGTEXT"
     )
-    private String fullName;
+    private String name;
 
     @Column(
             name = "Email",
@@ -71,7 +71,7 @@ public class User {
             nullable = false,
             columnDefinition = "LONGTEXT"
     )
-    private String passwordHash;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(

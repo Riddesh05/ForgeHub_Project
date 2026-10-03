@@ -25,9 +25,9 @@ public interface RFQVendorRepository extends JpaRepository<RFQVendor, Integer> {
                                     com.example.ForgeHubs.enums.RFQStatus.REOPENED)
             ORDER BY rv.rfq.rfqId DESC
             """)
-    List<RFQ> findActiveAssignedRfqs(@Param("vendorId") Integer vendorId);
+    List<RFQ> findActiveAssignedRfqs(@Param("vendorId") Long vendorId);
 
-    boolean existsByRfq_RfqIdAndVendor_UserId(Integer rfqId, Integer vendorId);
+    boolean existsByRfq_RfqIdAndVendor_UserId(Long rfqId, Long vendorId);
 
-    Optional<RFQVendor> findByRfq_RfqIdAndVendor_UserId(Integer rfqId, Integer vendorId);
+    Optional<RFQVendor> findByRfq_RfqIdAndVendor_UserId(Long rfqId, Long vendorId);
 }

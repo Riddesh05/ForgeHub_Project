@@ -8,14 +8,14 @@ import java.util.Optional;
 
 public interface FinalizedQuotationRepository extends JpaRepository<FinalizedQuotation, Integer> {
 
-    List<FinalizedQuotation> findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(Integer vendorId);
+    List<FinalizedQuotation> findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(Long vendorId);
 
     Optional<FinalizedQuotation> findByQuotation_QuotationIdAndQuotation_Vendor_UserId(
-            Integer quotationId,
-            Integer vendorId
+            Long quotationId,
+            Long vendorId
     );
 
-    Optional<FinalizedQuotation> findByRfq_RfqId(Integer rfqId);
+    Optional<FinalizedQuotation> findByRfq_RfqId(Long rfqId);
 
-    Optional<FinalizedQuotation> findByQuotation_QuotationId(Integer quotationId);
+    Optional<FinalizedQuotation> findByQuotation_QuotationId(Long quotationId);
 }

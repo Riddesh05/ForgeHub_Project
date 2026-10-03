@@ -28,7 +28,7 @@ public class FinalizedQuotation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FinalId")
-    private Integer finalId;
+    private Long finalId;
 
     @Column(name = "FinalizedDate")
     private LocalDateTime finalizedDate;

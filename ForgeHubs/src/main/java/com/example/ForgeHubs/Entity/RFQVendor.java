@@ -14,7 +14,7 @@ public class RFQVendor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private Integer id;
+    private Long id;
 
     // RFQ assigned to vendor
     @ManyToOne(fetch = FetchType.LAZY)

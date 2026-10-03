@@ -72,7 +72,7 @@ public class RFQServiceImpl implements RFQService {
     @Transactional
     public void saveRfq(
             RFQCreateRequest request,
-            Integer adminUserId,
+            Long adminUserId,
             boolean draft
     ) {
 
@@ -201,7 +201,7 @@ public class RFQServiceImpl implements RFQService {
 
         if (request.getVendorIds() != null) {
 
-            for (Integer vendorId
+            for (Long vendorId
                     : request.getVendorIds()) {
 
                 User vendor = userRepository.findById(vendorId)
@@ -216,7 +216,7 @@ public class RFQServiceImpl implements RFQService {
 
                     throw new RuntimeException(
                             "Selected user is not a vendor: "
-                                    + vendor.getFullName()
+                                    + vendor.getName()
                     );
                 }
 

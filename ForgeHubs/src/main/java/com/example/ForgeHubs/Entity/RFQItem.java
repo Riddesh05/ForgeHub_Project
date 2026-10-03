@@ -19,7 +19,7 @@ public class RFQItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ItemId")
-    private Integer itemId;
+    private Long itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RFQId", nullable = false)

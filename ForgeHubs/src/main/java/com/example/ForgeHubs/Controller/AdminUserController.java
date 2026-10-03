@@ -1,6 +1,6 @@
 package com.example.ForgeHubs.Controller;
 
-import com.example.ForgeHubs.DTO.UserCreateRequest;
+import com.example.ForgeHubs.DTO.UserRequestDto;
 import com.example.ForgeHubs.Entity.User;
 import com.example.ForgeHubs.Service.UserService;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class AdminUserController {
     @PostMapping("/create")
     public String createUser(
             @Valid @ModelAttribute("userRequest")
-            UserCreateRequest request,
+            UserRequestDto request,
 
             BindingResult bindingResult,
 

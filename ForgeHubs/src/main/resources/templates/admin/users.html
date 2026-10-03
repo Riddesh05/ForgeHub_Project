@@ -350,15 +350,15 @@
                                 <input
                                         type="text"
                                         class="form-control"
-                                        th:field="*{fullName}"
+                                        th:field="*{name}"
                                         placeholder="Enter full name"
                                         required>
 
 
                                 <div
                                         class="text-danger small mt-1"
-                                        th:if="${#fields.hasErrors('fullName')}"
-                                        th:errors="*{fullName}">
+                                        th:if="${#fields.hasErrors('name')}"
+                                        th:errors="*{name}">
 
                                 </div>
 
@@ -422,15 +422,15 @@
                                 <input
                                         type="password"
                                         class="form-control"
-                                        th:field="*{temporaryPassword}"
+                                        th:field="*{password}"
                                         placeholder="Enter temporary password"
                                         required>
 
 
                                 <div
                                         class="text-danger small mt-1"
-                                        th:if="${#fields.hasErrors('temporaryPassword')}"
-                                        th:errors="*{temporaryPassword}">
+                                        th:if="${#fields.hasErrors('password')}"
+                                        th:errors="*{password}">
 
                                 </div>
 
@@ -618,7 +618,7 @@
 
                                         <span
                                                 class="fw-semibold"
-                                                th:text="${user.fullName}">
+                                                th:text="${user.name}">
 
                                             ForgeHub Admin
 

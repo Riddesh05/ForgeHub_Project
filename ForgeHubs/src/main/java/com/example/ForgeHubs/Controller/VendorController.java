@@ -31,10 +31,10 @@ public class VendorController {
 
     @GetMapping({"", "/dashboard"})
     public String dashboard(
-            @RequestParam Integer vendorId,
+            @RequestParam Long vendorId,
             Model model
     ) {
-        Integer id = vendorId;
+        Long id = vendorId;
         User vendor = vendorService.getVendor(id);
         model.addAttribute("vendor", vendor);
         return "redirect:/vendor/open-rfq?vendorId=" + id;
@@ -42,10 +42,10 @@ public class VendorController {
 
     @GetMapping("/open-rfq")
     public String openRfqs(
-            @RequestParam Integer vendorId,
+            @RequestParam Long vendorId,
             Model model
     ) {
-        Integer id = vendorId;
+        Long id = vendorId;
         model.addAttribute("vendor", vendorService.getVendor(id));
         model.addAttribute("rfqs", vendorService.getOpenRfqs(id));
         model.addAttribute("vendorId", id);
@@ -54,12 +54,12 @@ public class VendorController {
 
     @GetMapping({"/rfq/{rfqId}", "/quote/{rfqId}"})
     public String rfqDetails(
-            @PathVariable Integer rfqId,
-            @RequestParam Integer vendorId,
+            @PathVariable Long rfqId,
+            @RequestParam Long vendorId,
             Model model,
             RedirectAttributes redirectAttributes
     ) {
-        Integer id = vendorId;
+        Long id = vendorId;
         try {
             RFQ rfq = vendorService.getAssignedRfq(rfqId, id);
             model.addAttribute("vendor", vendorService.getVendor(id));
@@ -75,8 +75,8 @@ public class VendorController {
 
     @PostMapping("/rfq/{rfqId}/submit")
     public String submitQuotation(
-            @PathVariable Integer rfqId,
-            @RequestParam Integer vendorId,
+            @PathVariable Long rfqId,
+            @RequestParam Long vendorId,
             @ModelAttribute("quotationRequest") VendorQuotationRequest request,
             RedirectAttributes redirectAttributes
     ) {
@@ -92,10 +92,10 @@ public class VendorController {
 
     @GetMapping("/my-submission")
     public String mySubmissions(
-            @RequestParam Integer vendorId,
+            @RequestParam Long vendorId,
             Model model
     ) {
-        Integer id = vendorId;
+        Long id = vendorId;
 
         User vendor = vendorService.getVendor(id);
 
@@ -111,7 +111,7 @@ public class VendorController {
          * This is used only for the History popup.
          * No new database table/column is required.
          */
-        Map<Integer, java.time.LocalDateTime> finalizedDates =
+        Map<Long, java.time.LocalDateTime> finalizedDates =
                 new java.util.HashMap<>();
 
         for (FinalizedQuotation finalized : finalizedQuotations) {
@@ -135,12 +135,12 @@ public class VendorController {
 
     @GetMapping("/submission/{quotationId}")
     public String submissionDetails(
-            @PathVariable Integer quotationId,
-            @RequestParam Integer vendorId,
+            @PathVariable Long quotationId,
+            @RequestParam Long vendorId,
             Model model,
             RedirectAttributes redirectAttributes
     ) {
-        Integer id = vendorId;
+        Long id = vendorId;
         try {
             RFQQuotation quotation = vendorService.getMySubmission(quotationId, id);
             model.addAttribute("vendor", vendorService.getVendor(id));
@@ -196,10 +196,10 @@ public class VendorController {
 
     @GetMapping("/finalized-quotation")
     public String finalizedQuotations(
-            @RequestParam Integer vendorId,
+            @RequestParam Long vendorId,
             Model model
     ) {
-        Integer id = vendorId;
+        Long id = vendorId;
         model.addAttribute("vendor", vendorService.getVendor(id));
         model.addAttribute("finalizedQuotations", vendorService.getFinalizedQuotations(id));
         model.addAttribute("vendorId", id);
