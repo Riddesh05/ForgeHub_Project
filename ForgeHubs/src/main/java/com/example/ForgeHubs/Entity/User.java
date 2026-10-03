@@ -27,13 +27,8 @@ public class User {
     private String password;
     private UserRole role;
     private boolean isFirstTimeLogin;
-    private boolean twoFactorEnabled;
-    private String twoFactorSecret;
-    private String pendingTwoFactorSecret;
     private String token;
     private String refreshToken;
-    private String recoveryOtp;
-    private LocalDateTime recoveryOtpExpiry;
 
 
 
