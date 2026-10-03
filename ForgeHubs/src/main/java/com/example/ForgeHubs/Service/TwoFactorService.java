@@ -7,4 +7,6 @@ public interface TwoFactorService {
     String generateQrCodeUri(String email, String secret);
 
     boolean verifyCode(String secret, String code);
+
+    String generateQrCode(String email, String secret);
 }

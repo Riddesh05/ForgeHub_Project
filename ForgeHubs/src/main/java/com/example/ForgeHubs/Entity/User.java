@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Builder
@@ -30,6 +32,8 @@ public class User {
     private String pendingTwoFactorSecret;
     private String token;
     private String refreshToken;
+    private String recoveryOtp;
+    private LocalDateTime recoveryOtpExpiry;
 
 
 
