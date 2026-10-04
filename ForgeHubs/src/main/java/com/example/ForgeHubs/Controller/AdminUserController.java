@@ -1,15 +1,18 @@
 package com.example.ForgeHubs.Controller;
 
 import com.example.ForgeHubs.DTO.UserRequestDto;
-import com.example.ForgeHubs.Entity.User;
 import com.example.ForgeHubs.Service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
@@ -44,6 +47,7 @@ public class AdminUserController {
             return "redirect:/admin/users?success";
 
         } catch (RuntimeException e) {
+            log.warn("Request failed: {}", e.getMessage(), e);
 
             model.addAttribute(
                     "error",

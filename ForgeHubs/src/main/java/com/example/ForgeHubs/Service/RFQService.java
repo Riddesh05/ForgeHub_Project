@@ -1,11 +1,10 @@
 package com.example.ForgeHubs.Service;
 
 import com.example.ForgeHubs.DTO.RFQCreateRequest;
-import com.example.ForgeHubs.Entity.RFQ;
-import com.example.ForgeHubs.Entity.RFQItem;
-import com.example.ForgeHubs.Entity.User;
+import com.example.ForgeHubs.DTO.RFQItemUpdateRequest;
+import com.example.ForgeHubs.DTO.RFQResponseDto;
+import com.example.ForgeHubs.DTO.UserResponseDto;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface RFQService {
@@ -16,27 +15,17 @@ public interface RFQService {
 
     void saveRfq(RFQCreateRequest request, Long adminUserId, boolean draft);
 
-    List<User> getAllVendors();
+    List<UserResponseDto> getAllVendors();
 
-    List<RFQ> getAllRFQs();
+    List<RFQResponseDto> getAllRFQs();
 
-    RFQ getRFQById(Integer id);
+    RFQResponseDto getRFQById(Long id);
 
-    List<RFQItem> getRFQItems(Integer rfqId);
+    void updateRFQ(Long id, RFQCreateRequest request, boolean draft);
 
-    void updateRFQ(Integer id, RFQCreateRequest request, boolean draft);
+    void updateRFQItem(RFQItemUpdateRequest request);
 
-    void updateRFQItem(
-            Integer itemId,
-            String itemName,
-            Integer reqQty,
-            String uom,
-            LocalDate reqDeliveryDate,
-            String deliveryLocation,
-            String description
-    );
+    void softDeleteRFQ(Long id);
 
-    void softDeleteRFQ(Integer id);
-
-    void openToRebid(Integer id);
+    void openToRebid(Long id);
 }

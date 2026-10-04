@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface FinalizedQuotationRepository extends JpaRepository<FinalizedQuotation, Integer> {
+public interface FinalizedQuotationRepository extends JpaRepository<FinalizedQuotation, Long> {
 
     List<FinalizedQuotation> findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(Long vendorId);
 
@@ -18,4 +18,6 @@ public interface FinalizedQuotationRepository extends JpaRepository<FinalizedQuo
     Optional<FinalizedQuotation> findByRfq_RfqId(Long rfqId);
 
     Optional<FinalizedQuotation> findByQuotation_QuotationId(Long quotationId);
+
+    List<FinalizedQuotation> findAllByOrderByFinalizedDateDesc();
 }

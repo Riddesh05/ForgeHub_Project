@@ -667,27 +667,27 @@
                                         <!-- CONFIGURED -->
 
                                         <span
-                                                th:if="${user.secretKey != null and !#strings.isEmpty(user.secretKey)}"
+                                                th:if="${user.totpConfigured}"
                                                 class="configured-badge">
 
-                                            <i class="bi bi-shield-check me-1"></i>
+    <i class="bi bi-shield-check me-1"></i>
 
-                                            Configured
+    Configured
 
-                                        </span>
-
+</span>
 
 
                                         <!-- NOT CONFIGURED -->
 
                                         <span
-                                                th:unless="${user.secretKey != null and !#strings.isEmpty(user.secretKey)}"
+                                                th:unless="${user.totpConfigured}"
                                                 class="not-configured-badge">
 
-                                            Not Configured
+    <i class="bi bi-shield-x me-1"></i>
 
-                                        </span>
+    Not Configured
 
+</span>
 
                                     </td>
 

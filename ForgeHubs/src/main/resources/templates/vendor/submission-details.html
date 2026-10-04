@@ -28,7 +28,7 @@
                     <div class="card-header bg-white fw-semibold">Quotation Summary</div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-3"><small class="text-muted d-block">RFQ No</small><strong th:text="${quotation.rfq.rfqNo}">RFQ</strong></div>
+                            <div class="col-md-3"><small class="text-muted d-block">RFQ No</small><strong th:text="${quotation.rfqNo}">RFQ</strong></div>
                             <div class="col-md-3"><small class="text-muted d-block">Status</small><span class="badge text-bg-primary" th:text="${quotation.status}">SUBMITTED</span></div>
                             <div class="col-md-3"><small class="text-muted d-block">Delivery Date</small><strong th:text="${quotation.deliveryDate != null ? #temporals.format(quotation.deliveryDate, 'dd-MM-yyyy') : '-'}">-</strong></div>
                             <div class="col-md-3"><small class="text-muted d-block">Payment Terms</small><strong th:text="${quotation.paymentTerms ?: '-'}">-</strong></div>

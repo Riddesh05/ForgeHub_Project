@@ -37,7 +37,10 @@ package com.example.ForgeHubs.Entity;
 
 import com.example.ForgeHubs.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "Users")
@@ -49,25 +52,25 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UserId")
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(
-            name = "FullName",
+            name = "full_name",
             nullable = false,
             columnDefinition = "LONGTEXT"
     )
     private String name;
 
     @Column(
-            name = "Email",
+            name = "email",
             nullable = false,
             columnDefinition = "LONGTEXT"
     )
     private String email;
 
     @Column(
-            name = "PasswordHash",
+            name = "password_hash",
             nullable = false,
             columnDefinition = "LONGTEXT"
     )
@@ -75,20 +78,20 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(
-            name = "Role",
+            name = "role",
             nullable = false,
             columnDefinition = "LONGTEXT"
     )
     private UserRole role;
 
     @Column(
-            name = "IsFirstTimeLogin",
+            name = "is_first_time_login",
             nullable = false
     )
     private Boolean isFirstTimeLogin;
 
     @Column(
-            name = "SecretKey",
+            name = "secret_key",
             columnDefinition = "LONGTEXT"
     )
     private String secretKey;

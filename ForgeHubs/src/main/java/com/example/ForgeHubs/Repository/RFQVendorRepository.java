@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface RFQVendorRepository extends JpaRepository<RFQVendor, Integer> {
+public interface RFQVendorRepository extends JpaRepository<RFQVendor, Long> {
 
     @Modifying
     @Query("DELETE FROM RFQVendor rv WHERE rv.rfq = :rfq")

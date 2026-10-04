@@ -1,33 +1,32 @@
         package com.example.ForgeHubs.ServiceImpl;
 
-import com.example.ForgeHubs.DTO.VendorQuotationItemRequest;
-import com.example.ForgeHubs.DTO.VendorQuotationRequest;
-import com.example.ForgeHubs.Entity.FinalizedQuotation;
-import com.example.ForgeHubs.Entity.RFQ;
-import com.example.ForgeHubs.Entity.RFQItem;
-import com.example.ForgeHubs.Entity.RFQQuotation;
-import com.example.ForgeHubs.Entity.User;
-import com.example.ForgeHubs.Repository.FinalizedQuotationRepository;
-import com.example.ForgeHubs.Repository.RFQQuotationRepository;
-import com.example.ForgeHubs.Repository.RFQVendorRepository;
-import com.example.ForgeHubs.Repository.UserRepository;
-import com.example.ForgeHubs.Service.VendorService;
-import com.example.ForgeHubs.enums.RFQStatus;
-import com.example.ForgeHubs.enums.UserRole;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+        import com.example.ForgeHubs.DTO.*;
+        import com.example.ForgeHubs.Entity.*;
+        import com.example.ForgeHubs.Exception.BusinessException;
+        import com.example.ForgeHubs.Exception.ResourceNotFoundException;
+        import com.example.ForgeHubs.Repository.FinalizedQuotationRepository;
+        import com.example.ForgeHubs.Repository.RFQQuotationRepository;
+        import com.example.ForgeHubs.Repository.RFQVendorRepository;
+        import com.example.ForgeHubs.Repository.UserRepository;
+        import com.example.ForgeHubs.Service.VendorService;
+        import com.example.ForgeHubs.Util.QuotationResponseMapper;
+        import com.example.ForgeHubs.enums.RFQStatus;
+        import com.example.ForgeHubs.enums.UserRole;
+        import com.fasterxml.jackson.core.JsonProcessingException;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import jakarta.transaction.Transactional;
+        import lombok.RequiredArgsConstructor;
+        import org.modelmapper.ModelMapper;
+        import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+        import java.math.BigDecimal;
+        import java.math.RoundingMode;
+        import java.time.LocalDate;
+        import java.time.LocalDateTime;
+        import java.util.ArrayList;
+        import java.util.LinkedHashMap;
+        import java.util.List;
+        import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,14 +40,27 @@ public class VendorServiceImpl implements VendorService {
     private final RFQQuotationRepository rfqQuotationRepository;
     private final FinalizedQuotationRepository finalizedQuotationRepository;
     private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
+    private final QuotationResponseMapper quotationResponseMapper;
 
     @Override
-    public User getVendor(Long vendorId) {
+    @Transactional
+    public UserResponseDto getVendor(Long vendorId) {
+
+        User vendor = getVendorEntity(vendorId);
+        return modelMapper.map(vendor, UserResponseDto.class);
+    }
+
+    private User getVendorEntity(Long vendorId) {
         User vendor = userRepository.findById(vendorId)
-                .orElseThrow(() -> new RuntimeException("Vendor not found: " + vendorId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Vendor was not found. Please select a valid vendor."
+                ));
 
         if (vendor.getRole() != UserRole.VENDOR) {
-            throw new RuntimeException("Selected user is not a vendor: " + vendor.getName());
+            throw new BusinessException(
+                    "Selected user is not a vendor: " + vendor.getName()
+            );
         }
 
         return vendor;
@@ -56,45 +68,53 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQ> getOpenRfqs(Long vendorId) {
-        getVendor(vendorId);
+    public List<RFQResponseDto> getOpenRfqs(Long vendorId) {
+
+        getVendorEntity(vendorId);
 
         List<RFQ> rfqs = rfqVendorRepository.findActiveAssignedRfqs(vendorId);
-        List<RFQ> result = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
-        for (RFQ rfq : rfqs) {
-            if (rfq.getExpiryDateOfBid() != null
-                    && today.isAfter(rfq.getExpiryDateOfBid().toLocalDate())) {
-                continue;
-            }
-
-            if (rfq.getItems() != null) {
-                rfq.getItems().size();
-            }
-
-            result.add(rfq);
-        }
-
-        return result;
+        return rfqs.stream()
+                .filter(rfq -> rfq.getExpiryDateOfBid() == null
+                        || !today.isAfter(rfq.getExpiryDateOfBid().toLocalDate()))
+                .peek(rfq -> {
+                    if (rfq.getItems() != null) {
+                        rfq.getItems().size();
+                    }
+                })
+                .map(rfq -> modelMapper.map(rfq, RFQResponseDto.class))
+                .toList();
     }
 
     @Override
     @Transactional
-    public RFQ getAssignedRfq(Long rfqId, Long vendorId) {
-        getVendor(vendorId);
+    public RFQResponseDto getAssignedRfq(Long rfqId, Long vendorId) {
+        return modelMapper.map(
+                getAssignedRfqEntity(rfqId, vendorId),
+                RFQResponseDto.class
+        );
+    }
+
+    private RFQ getAssignedRfqEntity(Long rfqId, Long vendorId) {
+
+        getVendorEntity(vendorId);
 
         if (!rfqVendorRepository.existsByRfq_RfqIdAndVendor_UserId(rfqId, vendorId)) {
-            throw new RuntimeException("This RFQ is not assigned to the selected vendor");
+            throw new BusinessException(
+                    "This RFQ is not assigned to the selected vendor"
+            );
         }
 
         RFQ rfq = rfqVendorRepository
                 .findByRfq_RfqIdAndVendor_UserId(rfqId, vendorId)
-                .orElseThrow(() -> new RuntimeException("RFQ assignment not found"))
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "RFQ assignment was not found for this vendor."
+                ))
                 .getRfq();
 
         if (Boolean.TRUE.equals(rfq.getIsDeleted())) {
-            throw new RuntimeException("This RFQ is inactive");
+            throw new BusinessException("This RFQ is inactive");
         }
 
         if (rfq.getItems() != null) {
@@ -111,20 +131,20 @@ public class VendorServiceImpl implements VendorService {
             Long vendorId,
             VendorQuotationRequest request
     ) {
-        User vendor = getVendor(vendorId);
-        RFQ rfq = getAssignedRfq(rfqId, vendorId);
+        User vendor = getVendorEntity(vendorId);
+        RFQ rfq = getAssignedRfqEntity(rfqId, vendorId);
 
         if (rfq.getStatus() != RFQStatus.OPEN && rfq.getStatus() != RFQStatus.REOPENED) {
-            throw new RuntimeException("Quotation can only be submitted for an OPEN or REOPENED RFQ");
+            throw new BusinessException("Quotation can only be submitted for an OPEN or REOPENED RFQ");
         }
 
         if (rfq.getExpiryDateOfBid() != null
                 && LocalDate.now().isAfter(rfq.getExpiryDateOfBid().toLocalDate())) {
-            throw new RuntimeException("Bid submission date has expired");
+            throw new BusinessException("Bid submission date has expired");
         }
 
         if (request.getItems() == null || request.getItems().isEmpty()) {
-            throw new RuntimeException("Quotation must contain at least one item");
+            throw new BusinessException("Quotation must contain at least one item");
         }
 
         Map<Long, RFQItem> rfqItems = new LinkedHashMap<>();
@@ -139,7 +159,7 @@ public class VendorServiceImpl implements VendorService {
             RFQItem item = rfqItems.get(itemRequest.getItemId());
 
             if (item == null) {
-                throw new RuntimeException("Invalid RFQ item selected: " + itemRequest.getItemId());
+                throw new BusinessException("Invalid RFQ item selected: " + itemRequest.getItemId());
             }
 
             int availableQty = itemRequest.getAvailableQty() == null
@@ -148,7 +168,7 @@ public class VendorServiceImpl implements VendorService {
 
             if (availableQty < 0
                     || (item.getReqQty() != null && availableQty > item.getReqQty())) {
-                throw new RuntimeException(
+                throw new BusinessException(
                         "Available quantity is invalid for item: " + item.getItemName()
                 );
             }
@@ -156,7 +176,7 @@ public class VendorServiceImpl implements VendorService {
             BigDecimal unitPrice = itemRequest.getUnitPrice();
 
             if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                throw new RuntimeException(
+                throw new BusinessException(
                         "Unit price is invalid for item: " + item.getItemName()
                 );
             }
@@ -166,7 +186,7 @@ public class VendorServiceImpl implements VendorService {
                     : itemRequest.getOtherCharges();
 
             if (otherCharges.compareTo(BigDecimal.ZERO) < 0) {
-                throw new RuntimeException(
+                throw new BusinessException(
                         "Other charges cannot be negative for item: " + item.getItemName()
                 );
             }
@@ -217,7 +237,7 @@ public class VendorServiceImpl implements VendorService {
             detailsJson = QUOTATION_JSON_PREFIX
                     + objectMapper.writeValueAsString(storedDetails);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to prepare quotation details", e);
+            throw new BusinessException("Unable to prepare quotation details", e);
         }
 
         RFQQuotation quotation = rfqQuotationRepository
@@ -244,49 +264,55 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQQuotation> getMySubmissions(Long vendorId) {
-        getVendor(vendorId);
+    public List<VendorQuotationResponseDto> getMySubmissions(Long vendorId) {
+
+        getVendorEntity(vendorId);
+
         return rfqQuotationRepository
-                .findByVendor_UserIdOrderBySubmittedDateDesc(vendorId);
+                .findByVendor_UserIdOrderBySubmittedDateDesc(vendorId)
+                .stream()
+                .map(quotationResponseMapper::toVendorQuotationResponse)
+                .toList();
     }
 
     @Override
     @Transactional
-    public RFQQuotation getMySubmission(Long quotationId, Long vendorId) {
-        getVendor(vendorId);
+    public VendorQuotationResponseDto getMySubmission(
+            Long quotationId,
+            Long vendorId
+    ) {
+
+        getVendorEntity(vendorId);
 
         RFQQuotation quotation = rfqQuotationRepository
                 .findByQuotationIdAndVendor_UserId(quotationId, vendorId)
-                .orElseThrow(() -> new RuntimeException("Quotation not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Quotation was not found."
+                ));
 
         if (quotation.getRfq() != null && quotation.getRfq().getItems() != null) {
             quotation.getRfq().getItems().size();
         }
 
-        return quotation;
+        return quotationResponseMapper.toVendorQuotationResponse(quotation);
     }
 
     @Override
     @Transactional
-    public List<FinalizedQuotation> getFinalizedQuotations(Long vendorId) {
-        getVendor(vendorId);
+    public List<FinalizedQuotationResponseDto> getFinalizedQuotations(Long vendorId) {
 
-        List<FinalizedQuotation> finalized =
-                finalizedQuotationRepository
-                        .findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(vendorId);
+        getVendorEntity(vendorId);
 
-        finalized.forEach(item -> {
-            if (item.getRfq() != null && item.getRfq().getItems() != null) {
-                item.getRfq().getItems().size();
-            }
-
-            if (item.getQuotation() != null) {
-                item.getQuotation().getQuotedAmount();
-                item.getQuotation().getBidNo();
-            }
-        });
-
-        return finalized;
+        return finalizedQuotationRepository
+                .findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(vendorId)
+                .stream()
+                .peek(item -> {
+                    if (item.getRfq() != null && item.getRfq().getItems() != null) {
+                        item.getRfq().getItems().size();
+                    }
+                })
+                .map(quotationResponseMapper::toFinalizedQuotationResponse)
+                .toList();
     }
 
     // =========================================================
@@ -295,38 +321,37 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQQuotation> getAllVendorQuotations() {
-        List<RFQQuotation> quotations =
-                rfqQuotationRepository.findAllByOrderBySubmittedDateDesc();
+    public List<VendorQuotationResponseDto> getAllVendorQuotations() {
 
-        quotations.forEach(quotation -> {
-            if (quotation.getRfq() != null && quotation.getRfq().getItems() != null) {
-                quotation.getRfq().getItems().size();
-            }
-
-            if (quotation.getVendor() != null) {
-                quotation.getVendor().getUserId();
-            }
-        });
-
-        return quotations;
+        return rfqQuotationRepository.findAllByOrderBySubmittedDateDesc()
+                .stream()
+                .peek(quotation -> {
+                    if (quotation.getRfq() != null && quotation.getRfq().getItems() != null) {
+                        quotation.getRfq().getItems().size();
+                    }
+                })
+                .map(quotationResponseMapper::toVendorQuotationResponse)
+                .toList();
     }
 
     @Override
     @Transactional
-    public RFQQuotation getQuotationForAdmin(Long quotationId) {
+    public VendorQuotationResponseDto getQuotationForAdmin(Long quotationId) {
+        return quotationResponseMapper.toVendorQuotationResponse(
+                getQuotationEntityForAdmin(quotationId)
+        );
+    }
+
+    private RFQQuotation getQuotationEntityForAdmin(Long quotationId) {
+
         RFQQuotation quotation = rfqQuotationRepository
                 .findById(quotationId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Vendor quotation not found: " + quotationId
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Vendor quotation was not found."
                 ));
 
         if (quotation.getRfq() != null && quotation.getRfq().getItems() != null) {
             quotation.getRfq().getItems().size();
-        }
-
-        if (quotation.getVendor() != null) {
-            quotation.getVendor().getUserId();
         }
 
         return quotation;
@@ -335,33 +360,103 @@ public class VendorServiceImpl implements VendorService {
     @Override
     @Transactional
     public void finalizeQuotation(Long quotationId) {
-        RFQQuotation quotation = getQuotationForAdmin(quotationId);
 
+        // 1. Selected quotation find karo
+        RFQQuotation selectedQuotation = getQuotationEntityForAdmin(quotationId);
+
+        // 2. Check already finalized
         if (finalizedQuotationRepository
                 .findByQuotation_QuotationId(quotationId)
                 .isPresent()) {
-            throw new RuntimeException("This quotation is already finalized.");
+
+            throw new BusinessException(
+                    "This quotation is already finalized."
+            );
         }
 
-        RFQ rfq = quotation.getRfq();
+        // 3. RFQ check
+        RFQ rfq = selectedQuotation.getRfq();
 
         if (rfq == null) {
-            throw new RuntimeException("Quotation is not linked to an RFQ.");
+            throw new BusinessException(
+                    "Quotation is not linked to an RFQ."
+            );
         }
 
+        // 4. Deleted / inactive RFQ cannot be finalized
         if (Boolean.TRUE.equals(rfq.getIsDeleted())) {
-            throw new RuntimeException("Inactive RFQ cannot be finalized.");
+            throw new BusinessException(
+                    "Inactive RFQ cannot be finalized."
+            );
         }
 
-        FinalizedQuotation finalized = new FinalizedQuotation();
-        finalized.setFinalizedDate(LocalDateTime.now());
-        finalized.setRfq(rfq);
-        finalized.setQuotation(quotation);
+        // 5. RFQ already finalized hai toh dobara finalize mat karo
+        if (rfq.getStatus() == RFQStatus.FINALIZED) {
+            throw new BusinessException(
+                    "This RFQ has already been finalized."
+            );
+        }
 
-        quotation.setStatus("FINALIZED");
+        // =========================================================
+        // 6. SAME RFQ KI SAARI QUOTATIONS NIKALO
+        // =========================================================
+
+        List<RFQQuotation> quotations =
+                rfqQuotationRepository.findByRfq_RfqId(
+                        rfq.getRfqId()
+                );
+
+        // =========================================================
+        // 7. SELECTED = FINALIZED
+        //    OTHERS = REJECTED
+        // =========================================================
+
+        for (RFQQuotation quotation : quotations) {
+
+            if (quotation.getQuotationId().equals(quotationId)) {
+
+                // Admin ne jis vendor ko select kiya
+                quotation.setStatus("FINALIZED");
+
+            } else {
+
+                // Same RFQ ke baaki vendors
+                quotation.setStatus("REJECTED");
+            }
+
+            rfqQuotationRepository.save(quotation);
+        }
+
+        // =========================================================
+        // 8. RFQ STATUS = FINALIZED
+        // =========================================================
+
         rfq.setStatus(RFQStatus.FINALIZED);
 
-        rfqQuotationRepository.save(quotation);
+        // =========================================================
+        // 9. FINALIZED QUOTATION RECORD CREATE KARO
+        // =========================================================
+
+        FinalizedQuotation finalized = new FinalizedQuotation();
+
+        finalized.setFinalizedDate(LocalDateTime.now());
+        finalized.setRfq(rfq);
+        finalized.setQuotation(selectedQuotation);
+
         finalizedQuotationRepository.save(finalized);
+    }
+
+    @Override
+    @Transactional
+    public List<FinalizedQuotationResponseDto> getAllFinalizedQuotations() {
+        return finalizedQuotationRepository.findAllByOrderByFinalizedDateDesc()
+                .stream()
+                .peek(item -> {
+                    if (item.getRfq() != null && item.getRfq().getItems() != null) {
+                        item.getRfq().getItems().size();
+                    }
+                })
+                .map(quotationResponseMapper::toFinalizedQuotationResponse)
+                .toList();
     }
 }

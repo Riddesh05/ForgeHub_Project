@@ -1,27 +1,23 @@
 package com.example.ForgeHubs.Controller;
 
+import com.example.ForgeHubs.DTO.RFQResponseDto;
 import com.example.ForgeHubs.DTO.UserRequestDto;
-import com.example.ForgeHubs.Entity.RFQQuotation;
+import com.example.ForgeHubs.DTO.VendorQuotationResponseDto;
+import com.example.ForgeHubs.Service.RFQService;
 import com.example.ForgeHubs.Service.UserService;
 import com.example.ForgeHubs.Service.VendorService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.ForgeHubs.enums.RFQStatus;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 @AllArgsConstructor
@@ -29,154 +25,135 @@ public class AdminSectionController {
 
     private final UserService userService;
     private final VendorService vendorService;
-    private final ObjectMapper objectMapper;
+    private final RFQService rfqService;
+
+    // =========================================================
+    // ADMIN DASHBOARD
+    // =========================================================
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("title", "Dashboard");
-        return "admin/section-placeholder";
+
+        List<RFQResponseDto> rfqs = rfqService.getAllRFQs();
+
+        long totalRFQs = rfqs.size();
+        long draftRFQs = rfqs.stream()
+                .filter(rfq -> rfq.getStatus() == RFQStatus.DRAFT)
+                .count();
+
+        long openRFQs = rfqs.stream()
+                .filter(rfq ->
+                        rfq.getStatus() == RFQStatus.OPEN ||
+                                rfq.getStatus() == RFQStatus.REOPENED
+                )
+                .count();
+
+        long closedRFQs = rfqs.stream()
+                .filter(rfq -> rfq.getStatus() == RFQStatus.CLOSED)
+                .count();
+
+        long finalizedRFQs = rfqs.stream()
+                .filter(rfq -> rfq.getStatus() == RFQStatus.FINALIZED)
+                .count();
+
+        model.addAttribute("totalRFQs", totalRFQs);
+        model.addAttribute("draftRFQs", draftRFQs);
+        model.addAttribute("openRFQs", openRFQs);
+        model.addAttribute("closedRFQs", closedRFQs);
+        model.addAttribute("finalizedRFQs", finalizedRFQs);
+        model.addAttribute("recentRFQs", rfqs.stream().limit(5).toList());
+
+        return "admin/dashboard";
     }
+
+    // =========================================================
+    // VENDOR QUOTATION
+    // =========================================================
 
     @GetMapping("/vendor-quotation")
     public String vendorQuotation(Model model) {
-        model.addAttribute("quotations", vendorService.getAllVendorQuotations());
+
+        model.addAttribute(
+                "quotations",
+                vendorService.getAllVendorQuotations()
+        );
+
         return "admin/vendor-quotation";
     }
 
+    // =========================================================
+    // VENDOR QUOTATION DETAILS
+    // =========================================================
+
     @GetMapping("/vendor-quotation/details/{quotationId}")
     @ResponseBody
-    public ResponseEntity<VendorQuotationDetailsResponse> vendorQuotationDetails(
+    public ResponseEntity<VendorQuotationResponseDto> vendorQuotationDetails(
             @PathVariable Long quotationId
     ) {
-        RFQQuotation quotation = vendorService.getQuotationForAdmin(quotationId);
-        return ResponseEntity.ok(toDetailsResponse(quotation));
+        return ResponseEntity.ok(
+                vendorService.getQuotationForAdmin(quotationId)
+        );
     }
+
+    // =========================================================
+    // FINALIZE VENDOR QUOTATION
+    // =========================================================
 
     @PostMapping("/vendor-quotation/finalize/{quotationId}")
     public String finalizeVendorQuotation(
             @PathVariable Long quotationId,
             RedirectAttributes redirectAttributes
     ) {
+
         try {
             vendorService.finalizeQuotation(quotationId);
+
             redirectAttributes.addFlashAttribute(
                     "success",
                     "Vendor quotation finalized successfully."
             );
+
         } catch (RuntimeException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            log.warn("Request failed: {}", e.getMessage(), e);
+
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    e.getMessage()
+            );
         }
 
         return "redirect:/admin/vendor-quotation";
     }
 
-    private VendorQuotationDetailsResponse toDetailsResponse(RFQQuotation quotation) {
-        List<QuotationItemResponse> items = new ArrayList<>();
-        BigDecimal subtotal = BigDecimal.ZERO;
-        BigDecimal gstAmount = BigDecimal.ZERO;
-        BigDecimal grandTotal = quotation.getQuotedAmount() == null
-                ? BigDecimal.ZERO
-                : quotation.getQuotedAmount();
-        String remarks = "";
-
-        String storedRemarks = quotation.getRemarks();
-
-        if (storedRemarks != null && storedRemarks.startsWith("FORGEHUB_QUOTATION_V1:")) {
-            String json = storedRemarks.substring("FORGEHUB_QUOTATION_V1:".length());
-            try {
-                JsonNode root = objectMapper.readTree(json);
-
-                if (root.has("subtotal")) {
-                    subtotal = root.get("subtotal").decimalValue();
-                }
-                if (root.has("gstAmount")) {
-                    gstAmount = root.get("gstAmount").decimalValue();
-                }
-                if (root.has("grandTotal")) {
-                    grandTotal = root.get("grandTotal").decimalValue();
-                }
-                if (root.has("remarks") && !root.get("remarks").isNull()) {
-                    remarks = root.get("remarks").asText();
-                }
-
-                JsonNode itemNodes = root.get("items");
-                if (itemNodes != null && itemNodes.isArray()) {
-                    for (JsonNode item : itemNodes) {
-                        items.add(new QuotationItemResponse(
-                                item.path("itemId").asInt(),
-                                item.path("itemName").asText("-"),
-                                item.path("requiredQty").asInt(),
-                                item.path("availableQty").asInt(),
-                                item.path("uom").asText("-"),
-                                item.path("unitPrice").decimalValue(),
-                                item.path("otherCharges").decimalValue(),
-                                item.path("subtotal").decimalValue()
-                        ));
-                    }
-                }
-            } catch (JsonProcessingException e) {
-                remarks = storedRemarks;
-            }
-        } else if (storedRemarks != null) {
-            remarks = storedRemarks;
-        }
-
-        return new VendorQuotationDetailsResponse(
-                quotation.getQuotationId(),
-                quotation.getBidNo(),
-                quotation.getRfq() != null ? quotation.getRfq().getRfqNo() : "-",
-                quotation.getVendor() != null ? quotation.getVendor().getName() : "-",
-                quotation.getVendor() != null ? quotation.getVendor().getEmail() : "-",
-                grandTotal,
-                subtotal,
-                gstAmount,
-                quotation.getDeliveryDate(),
-                quotation.getPaymentTerms(),
-                remarks,
-                quotation.getStatus(),
-                quotation.getSubmittedDate(),
-                items
-        );
-    }
+    // =========================================================
+    // FINANCE QUOTATION
+    // =========================================================
 
     @GetMapping("/finance-quotation")
     public String financeQuotation(Model model) {
+
         model.addAttribute("title", "Finance Quotation");
+
         return "admin/section-placeholder";
     }
 
+    // =========================================================
+    // USERS PAGE
+    // =========================================================
+
     @GetMapping("/users")
     public String users(Model model) {
-        model.addAttribute("userRequest", new UserRequestDto());
-        model.addAttribute("users", userService.getAllUsers());
+
+        model.addAttribute(
+                "userRequest",
+                new UserRequestDto()
+        );
+
+        model.addAttribute(
+                "users",
+                userService.getAllUsers()
+        );
+
         return "admin/users";
     }
-
-    public record VendorQuotationDetailsResponse(
-            Long quotationId,
-            String bidNo,
-            String rfqNo,
-            String vendorName,
-            String vendorEmail,
-            BigDecimal grandTotal,
-            BigDecimal subtotal,
-            BigDecimal gstAmount,
-            java.time.LocalDate deliveryDate,
-            String paymentTerms,
-            String remarks,
-            String status,
-            java.time.LocalDateTime submittedDate,
-            List<QuotationItemResponse> items
-    ) {}
-
-    public record QuotationItemResponse(
-            Integer itemId,
-            String itemName,
-            Integer requiredQty,
-            Integer availableQty,
-            String uom,
-            BigDecimal unitPrice,
-            BigDecimal otherCharges,
-            BigDecimal subtotal
-    ) {}
 }

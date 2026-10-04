@@ -1,14 +1,9 @@
 package com.example.ForgeHubs.Controller;
 
-import com.example.ForgeHubs.DTO.VendorQuotationRequest;
-import com.example.ForgeHubs.Entity.FinalizedQuotation;
-import com.example.ForgeHubs.Entity.RFQ;
-import com.example.ForgeHubs.Entity.RFQQuotation;
-import com.example.ForgeHubs.Entity.User;
+import com.example.ForgeHubs.DTO.*;
 import com.example.ForgeHubs.Service.VendorService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequestMapping("/vendor")
 @RequiredArgsConstructor
 public class VendorController {
 
-    private static final String QUOTATION_JSON_PREFIX = "FORGEHUB_QUOTATION_V1:";
-
     private final VendorService vendorService;
-    private final ObjectMapper objectMapper;
 
     @GetMapping({"", "/dashboard"})
     public String dashboard(
@@ -35,7 +28,7 @@ public class VendorController {
             Model model
     ) {
         Long id = vendorId;
-        User vendor = vendorService.getVendor(id);
+        UserResponseDto vendor = vendorService.getVendor(id);
         model.addAttribute("vendor", vendor);
         return "redirect:/vendor/open-rfq?vendorId=" + id;
     }
@@ -61,13 +54,14 @@ public class VendorController {
     ) {
         Long id = vendorId;
         try {
-            RFQ rfq = vendorService.getAssignedRfq(rfqId, id);
+            RFQResponseDto rfq = vendorService.getAssignedRfq(rfqId, id);
             model.addAttribute("vendor", vendorService.getVendor(id));
             model.addAttribute("rfq", rfq);
             model.addAttribute("vendorId", id);
             model.addAttribute("quotationRequest", new VendorQuotationRequest());
             return "vendor/rfq-details";
         } catch (RuntimeException e) {
+            log.warn("Request failed: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/vendor/open-rfq?vendorId=" + id;
         }
@@ -85,6 +79,7 @@ public class VendorController {
             redirectAttributes.addFlashAttribute("success", "Quotation submitted successfully.");
             return "redirect:/vendor/my-submission?vendorId=" + vendorId;
         } catch (RuntimeException e) {
+            log.warn("Request failed: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/vendor/rfq/" + rfqId + "?vendorId=" + vendorId;
         }
@@ -97,36 +92,39 @@ public class VendorController {
     ) {
         Long id = vendorId;
 
-        User vendor = vendorService.getVendor(id);
+        UserResponseDto vendor = vendorService.getVendor(id);
 
-        List<RFQQuotation> submissions =
-                vendorService.getMySubmissions(id);
+        List<VendorQuotationResponseDto> submissionResponses =
+                new ArrayList<>(vendorService.getMySubmissions(id));
 
-        List<FinalizedQuotation> finalizedQuotations =
+        List<FinalizedQuotationResponseDto> finalizedQuotations =
                 vendorService.getFinalizedQuotations(id);
 
-        /*
-         * quotationId -> finalizedDate
-         *
-         * This is used only for the History popup.
-         * No new database table/column is required.
-         */
-        Map<Long, java.time.LocalDateTime> finalizedDates =
-                new java.util.HashMap<>();
+        Map<Long, java.time.LocalDateTime> finalizedDates = new java.util.HashMap<>();
+        for (FinalizedQuotationResponseDto finalized : finalizedQuotations) {
+            Long quotationId = finalized.getQuotationId();
+            if (quotationId != null) {
+                finalizedDates.put(quotationId, finalized.getFinalizedDate());
 
-        for (FinalizedQuotation finalized : finalizedQuotations) {
-
-            if (finalized.getQuotation() != null) {
-
-                finalizedDates.put(
-                        finalized.getQuotation().getQuotationId(),
-                        finalized.getFinalizedDate()
-                );
+                submissionResponses.stream()
+                        .filter(s -> quotationId.equals(s.getQuotationId()))
+                        .findFirst()
+                        .ifPresent(s -> {
+                            if (s.getHistory() != null) {
+                                s.getHistory().add(new com.example.ForgeHubs.DTO.VendorQuotationHistory(
+                                        "Quotation Finalized",
+                                        "FINAL",
+                                        s.getQuotedAmount(),
+                                        finalized.getFinalizedDate(),
+                                        "FINALIZED"
+                                ));
+                            }
+                        });
             }
         }
 
         model.addAttribute("vendor", vendor);
-        model.addAttribute("submissions", submissions);
+        model.addAttribute("submissions", submissionResponses);
         model.addAttribute("finalizedDates", finalizedDates);
         model.addAttribute("vendorId", id);
 
@@ -142,56 +140,66 @@ public class VendorController {
     ) {
         Long id = vendorId;
         try {
-            RFQQuotation quotation = vendorService.getMySubmission(quotationId, id);
+            VendorQuotationResponseDto quotation = vendorService.getMySubmission(quotationId, id);
             model.addAttribute("vendor", vendorService.getVendor(id));
             model.addAttribute("quotation", quotation);
             model.addAttribute("vendorId", id);
             addStoredQuotationDetails(model, quotation);
             return "vendor/submission-details";
         } catch (RuntimeException e) {
+            log.warn("Request failed: {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/vendor/my-submission?vendorId=" + id;
         }
     }
 
-    private void addStoredQuotationDetails(Model model, RFQQuotation quotation) {
-        List<Map<String, Object>> quotationItems = new ArrayList<>();
-        BigDecimal subtotal = BigDecimal.ZERO;
-        BigDecimal gstAmount = BigDecimal.ZERO;
-        BigDecimal grandTotal = quotation.getQuotedAmount() == null
-                ? BigDecimal.ZERO
-                : quotation.getQuotedAmount();
-        String remarks = "";
+    private void addStoredQuotationDetails(
+            Model model,
+            VendorQuotationResponseDto quotation
+    ) {
 
-        String stored = quotation.getRemarks();
-        if (stored != null && stored.startsWith(QUOTATION_JSON_PREFIX)) {
-            try {
-                JsonNode root = objectMapper.readTree(
-                        stored.substring(QUOTATION_JSON_PREFIX.length())
-                );
-                if (root.has("subtotal")) subtotal = root.get("subtotal").decimalValue();
-                if (root.has("gstAmount")) gstAmount = root.get("gstAmount").decimalValue();
-                if (root.has("grandTotal")) grandTotal = root.get("grandTotal").decimalValue();
-                if (root.has("remarks") && !root.get("remarks").isNull()) {
-                    remarks = root.get("remarks").asText();
-                }
-                if (root.has("items") && root.get("items").isArray()) {
-                    for (JsonNode item : root.get("items")) {
-                        quotationItems.add(objectMapper.convertValue(item, Map.class));
-                    }
-                }
-            } catch (Exception ignored) {
-                remarks = stored;
-            }
-        } else if (stored != null) {
-            remarks = stored;
+        List<Map<String, Object>> quotationItems = new ArrayList<>();
+
+        if (quotation.getItems() != null) {
+            quotation.getItems().forEach(item -> {
+                Map<String, Object> row = new java.util.LinkedHashMap<>();
+                row.put("itemId", item.getItemId());
+                row.put("itemName", item.getItemName());
+                row.put("requiredQty", item.getRequiredQty());
+                row.put("availableQty", item.getAvailableQty());
+                row.put("uom", item.getUom());
+                row.put("unitPrice", item.getUnitPrice());
+                row.put("otherCharges", item.getOtherCharges());
+                row.put("subtotal", item.getItemSubtotal() != null
+                        ? item.getItemSubtotal()
+                        : item.getSubtotal());
+                quotationItems.add(row);
+            });
         }
 
         model.addAttribute("quotationItems", quotationItems);
-        model.addAttribute("quotationSubtotal", subtotal);
-        model.addAttribute("quotationGstAmount", gstAmount);
-        model.addAttribute("quotationGrandTotal", grandTotal);
-        model.addAttribute("quotationRemarks", remarks);
+        model.addAttribute(
+                "quotationSubtotal",
+                quotation.getSubtotal() == null
+                        ? BigDecimal.ZERO
+                        : quotation.getSubtotal()
+        );
+        model.addAttribute(
+                "quotationGstAmount",
+                quotation.getGstAmount() == null
+                        ? BigDecimal.ZERO
+                        : quotation.getGstAmount()
+        );
+        model.addAttribute(
+                "quotationGrandTotal",
+                quotation.getGrandTotal() == null
+                        ? BigDecimal.ZERO
+                        : quotation.getGrandTotal()
+        );
+        model.addAttribute(
+                "quotationRemarks",
+                quotation.getRemarks() == null ? "" : quotation.getRemarks()
+        );
     }
 
     @GetMapping("/finalized-quotation")

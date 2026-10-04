@@ -1,11 +1,12 @@
 package com.example.ForgeHubs.ServiceImpl;
 
-import com.example.ForgeHubs.DTO.RFQCreateRequest;
-import com.example.ForgeHubs.DTO.RFQItemRequest;
+import com.example.ForgeHubs.DTO.*;
 import com.example.ForgeHubs.Entity.RFQ;
 import com.example.ForgeHubs.Entity.RFQItem;
 import com.example.ForgeHubs.Entity.RFQVendor;
 import com.example.ForgeHubs.Entity.User;
+import com.example.ForgeHubs.Exception.BusinessException;
+import com.example.ForgeHubs.Exception.ResourceNotFoundException;
 import com.example.ForgeHubs.Repository.RFQItemRepository;
 import com.example.ForgeHubs.Repository.RFQRepository;
 import com.example.ForgeHubs.Repository.RFQVendorRepository;
@@ -15,9 +16,9 @@ import com.example.ForgeHubs.enums.RFQStatus;
 import com.example.ForgeHubs.enums.UserRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class RFQServiceImpl implements RFQService {
     private final RFQItemRepository rfqItemRepository;
     private final RFQVendorRepository rfqVendorRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
 
     // =========================================================
@@ -78,8 +80,8 @@ public class RFQServiceImpl implements RFQService {
 
         User admin = userRepository.findById(adminUserId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Admin user not found"
+                        new ResourceNotFoundException(
+                                "Admin user was not found. Please sign in again."
                         )
                 );
 
@@ -133,7 +135,7 @@ public class RFQServiceImpl implements RFQService {
             for (RFQItemRequest itemRequest
                     : request.getItems()) {
 
-                RFQItem item = new RFQItem();
+                RFQItem item = modelMapper.map(itemRequest, RFQItem.class);
 
                 item.setRfq(rfq);
 
@@ -152,31 +154,6 @@ public class RFQServiceImpl implements RFQService {
                                 "FAC-%06d",
                                 lineNo
                         )
-                );
-
-                // User-entered fields
-                item.setItemName(
-                        itemRequest.getItemName()
-                );
-
-                item.setReqQty(
-                        itemRequest.getReqQty()
-                );
-
-                item.setUom(
-                        itemRequest.getUom()
-                );
-
-                item.setReqDeliveryDate(
-                        itemRequest.getReqDeliveryDate()
-                );
-
-                item.setDeliveryLocation(
-                        itemRequest.getDeliveryLocation()
-                );
-
-                item.setDescription(
-                        itemRequest.getDescription()
                 );
 
                 items.add(item);
@@ -206,15 +183,15 @@ public class RFQServiceImpl implements RFQService {
 
                 User vendor = userRepository.findById(vendorId)
                         .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Vendor not found: "
+                                new ResourceNotFoundException(
+                                        "Vendor was not found: "
                                                 + vendorId
                                 )
                         );
 
                 if (vendor.getRole() != UserRole.VENDOR) {
 
-                    throw new RuntimeException(
+                    throw new BusinessException(
                             "Selected user is not a vendor: "
                                     + vendor.getName()
                     );
@@ -235,98 +212,65 @@ public class RFQServiceImpl implements RFQService {
 
 
     // =========================================================
-    // GET ALL VENDORS
+    // READ FLOW: ENTITY -> RESPONSE DTO
     // =========================================================
 
     @Override
-    public List<User> getAllVendors() {
+    @Transactional
+    public List<UserResponseDto> getAllVendors() {
 
-        return userRepository.findByRole(
-                UserRole.VENDOR
-        );
+        return userRepository.findByRole(UserRole.VENDOR)
+                .stream()
+                .map(user -> modelMapper.map(user, UserResponseDto.class))
+                .toList();
     }
 
+    @Override
+    @Transactional
+    public List<RFQResponseDto> getAllRFQs() {
 
-    // =========================================================
-    // GET ALL RFQs
-    // =========================================================
+        List<RFQ> rfqs = rfqRepository.findAllByOrderByRfqIdDesc();
 
-//    @Override
-//    @Transactional
-//    public List<RFQ> getAllRFQs() {
-//
-//        List<RFQ> rfqs =
-//                rfqRepository
-//                        .findAllByOrderByRfqIdDesc();
-//
-//        /*
-//         * Initialize items while transaction
-//         * is still active.
-//         */
-//        rfqs.forEach(
-//                rfq -> rfq.getItems().size()
-//        );
-//
-//        return rfqs;
-//    }
-@Override
-@Transactional
-public List<RFQ> getAllRFQs() {
+        LocalDateTime now = LocalDateTime.now();
 
-    List<RFQ> rfqs = rfqRepository.findAllByOrderByRfqIdDesc();
+        for (RFQ rfq : rfqs) {
 
-    LocalDateTime now = LocalDateTime.now();
+            if (rfq.getItems() != null) {
+                rfq.getItems().size();
+            }
 
-    for (RFQ rfq : rfqs) {
+            if (rfq.getStatus() == RFQStatus.OPEN
+                    && rfq.getExpiryDateOfBid() != null
+                    && now.isAfter(rfq.getExpiryDateOfBid())) {
 
-        // Load items
-        rfq.getItems().size();
-
-        // Automatically close expired OPEN RFQs
-        if (rfq.getStatus() == RFQStatus.OPEN
-                && rfq.getExpiryDateOfBid() != null
-                && now.isAfter(rfq.getExpiryDateOfBid())) {
-
-            rfq.setStatus(RFQStatus.CLOSED);
-            rfqRepository.save(rfq);
+                rfq.setStatus(RFQStatus.CLOSED);
+                rfqRepository.save(rfq);
+            }
         }
+
+        return rfqs.stream()
+                .map(rfq -> modelMapper.map(rfq, RFQResponseDto.class))
+                .toList();
     }
 
-    return rfqs;
-}
-
-
-    // =========================================================
-    // GET RFQ BY ID
-    // =========================================================
-
     @Override
-    public RFQ getRFQById(Integer id) {
+    @Transactional
+    public RFQResponseDto getRFQById(Long id) {
 
-        return rfqRepository
+        RFQ rfq = rfqRepository
                 .findByRfqIdAndIsDeletedFalse(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "RFQ not found with ID: "
-                                        + id
+                        new BusinessException(
+                                "RFQ not found with ID: " + id
                         )
                 );
+
+        if (rfq.getItems() != null) {
+            rfq.getItems().size();
+        }
+
+        return modelMapper.map(rfq, RFQResponseDto.class);
     }
-
-
-    // =========================================================
-    // GET RFQ ITEMS
-    // =========================================================
-
-    @Override
-    public List<RFQItem> getRFQItems(
-            Integer rfqId
-    ) {
-
-        return rfqItemRepository
-                .findByRfq_RfqId(rfqId);
-    }
-
 
     // =========================================================
     // SOFT DELETE
@@ -334,12 +278,12 @@ public List<RFQ> getAllRFQs() {
 
     @Override
     @Transactional
-    public void softDeleteRFQ(Integer id) {
+    public void softDeleteRFQ(Long id) {
 
         RFQ rfq = rfqRepository
                 .findByRfqIdAndIsDeletedFalse(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new BusinessException(
                                 "RFQ not found with ID: "
                                         + id
                         )
@@ -358,7 +302,7 @@ public List<RFQ> getAllRFQs() {
     @Override
     @Transactional
     public void updateRFQ(
-            Integer id,
+            Long id,
             RFQCreateRequest request,
             boolean draft
     ) {
@@ -366,7 +310,7 @@ public List<RFQ> getAllRFQs() {
         RFQ rfq = rfqRepository
                 .findByRfqIdAndIsDeletedFalse(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new BusinessException(
                                 "RFQ not found with ID: "
                                         + id
                         )
@@ -439,22 +383,14 @@ public List<RFQ> getAllRFQs() {
 
     @Override
     @Transactional
-    public void updateRFQItem(
-            Integer itemId,
-            String itemName,
-            Integer reqQty,
-            String uom,
-            LocalDate reqDeliveryDate,
-            String deliveryLocation,
-            String description
-    ) {
+    public void updateRFQItem(RFQItemUpdateRequest request) {
 
         RFQItem item = rfqItemRepository
-                .findById(itemId)
+                .findById(request.getItemId())
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new BusinessException(
                                 "RFQ Item not found with ID: "
-                                        + itemId
+                                        + request.getItemId()
                         )
                 );
 
@@ -464,23 +400,17 @@ public List<RFQ> getAllRFQs() {
          * are updated.
          */
 
-        item.setItemName(itemName);
+        item.setItemName(request.getItemName());
 
-        item.setReqQty(reqQty);
+        item.setReqQty(request.getReqQty());
 
-        item.setUom(uom);
+        item.setUom(request.getUom());
 
-        item.setReqDeliveryDate(
-                reqDeliveryDate
-        );
+        item.setReqDeliveryDate(request.getReqDeliveryDate());
 
-        item.setDeliveryLocation(
-                deliveryLocation
-        );
+        item.setDeliveryLocation(request.getDeliveryLocation());
 
-        item.setDescription(
-                description
-        );
+        item.setDescription(request.getDescription());
 
 
         /*
@@ -504,12 +434,12 @@ public List<RFQ> getAllRFQs() {
 
     @Override
     @Transactional
-    public void openToRebid(Integer id) {
+    public void openToRebid(Long id) {
 
         RFQ rfq = rfqRepository
                 .findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new BusinessException(
                                 "RFQ not found with ID: "
                                         + id
                         )
@@ -519,7 +449,7 @@ public List<RFQ> getAllRFQs() {
                 rfq.getIsDeleted()
         )) {
 
-            throw new RuntimeException(
+            throw new BusinessException(
                     "Inactive RFQ cannot be opened for rebid."
             );
         }
@@ -527,7 +457,7 @@ public List<RFQ> getAllRFQs() {
         if (rfq.getStatus()
                 != RFQStatus.CLOSED) {
 
-            throw new RuntimeException(
+            throw new BusinessException(
                     "Only CLOSED RFQ can be opened for rebid."
             );
         }

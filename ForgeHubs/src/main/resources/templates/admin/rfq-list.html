@@ -234,22 +234,22 @@
                     </td>
 
                     <td>
-                        <span th:if="${rfq.isDeleted}"
+                        <span th:if="${rfq.deleted}"
                               class="status-badge status-inactive">INACTIVE</span>
 
-                        <span th:if="${!rfq.isDeleted and rfq.status.name() == 'DRAFT'}"
+                        <span th:if="${!rfq.deleted and rfq.status.name() == 'DRAFT'}"
                               class="status-badge status-draft">DRAFT</span>
 
-                        <span th:if="${!rfq.isDeleted and rfq.status.name() == 'OPEN'}"
+                        <span th:if="${!rfq.deleted and rfq.status.name() == 'OPEN'}"
                               class="status-badge status-open">OPEN</span>
 
-                        <span th:if="${!rfq.isDeleted and rfq.status.name() == 'CLOSED'}"
+                        <span th:if="${!rfq.deleted and rfq.status.name() == 'CLOSED'}"
                               class="status-badge status-closed">CLOSED</span>
 
-                        <span th:if="${!rfq.isDeleted and rfq.status.name() == 'REOPENED'}"
+                        <span th:if="${!rfq.deleted and rfq.status.name() == 'REOPENED'}"
                               class="status-badge status-reopened">REOPENED</span>
 
-                        <span th:if="${!rfq.isDeleted and rfq.status.name() == 'FINALIZED'}"
+                        <span th:if="${!rfq.deleted and rfq.status.name() == 'FINALIZED'}"
                               class="status-badge status-finalized">FINALIZED</span>
                     </td>
 
@@ -266,7 +266,7 @@
 
                         <!-- HEADER EDIT -->
                         <button type="button"
-                                th:if="${!rfq.isDeleted}"
+                                th:if="${!rfq.deleted}"
                                 class="action-btn edit-btn"
                                 title="Edit RFQ"
                                 th:attr="data-rfq-id=${rfq.rfqId}"
@@ -276,7 +276,7 @@
 
                         <!-- DELETE -->
                         <button type="button"
-                                th:if="${!rfq.isDeleted}"
+                                th:if="${!rfq.deleted}"
                                 class="action-btn delete-btn"
                                 title="Delete RFQ"
                                 th:attr="data-rfq-id=${rfq.rfqId}"
@@ -286,7 +286,7 @@
 
                         <!-- OPEN TO REBID: ONLY CLOSED -->
                         <button type="button"
-                                th:if="${!rfq.isDeleted and rfq.status.name() == 'CLOSED'}"
+                                th:if="${!rfq.deleted and rfq.status.name() == 'CLOSED'}"
                                 class="action-btn rebid-btn"
                                 title="Open to Rebid"
                                 th:attr="data-rfq-id=${rfq.rfqId}"

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface RFQRepository extends JpaRepository<RFQ, Integer> {
+public interface RFQRepository extends JpaRepository<RFQ, Long> {
 
     Optional<RFQ> findByRfqNo(String rfqNo);
 
@@ -15,20 +15,9 @@ public interface RFQRepository extends JpaRepository<RFQ, Integer> {
 
     boolean existsByIndentNo(String indentNo);
 
-    /*
-     * RFQ List
-     *
-     * Includes active + soft deleted RFQs.
-     * Soft deleted RFQs will be shown as INACTIVE.
-     */
     List<RFQ> findAllByOrderByRfqIdDesc();
 
-    /*
-     * Get active RFQ by ID
-     */
-    Optional<RFQ> findByRfqIdAndIsDeletedFalse(Integer rfqId);
+    Optional<RFQ> findByRfqIdAndIsDeletedFalse(Long rfqId);
 
-    List<RFQ> findByStatusAndIsDeletedFalseOrderByRfqIdDesc(
-            RFQStatus status
-    );
+    List<RFQ> findByStatusAndIsDeletedFalseOrderByRfqIdDesc(RFQStatus status);
 }

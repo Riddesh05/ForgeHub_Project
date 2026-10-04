@@ -15,4 +15,5 @@ public interface RFQQuotationRepository extends JpaRepository<RFQQuotation, Long
     Optional<RFQQuotation> findByRfq_RfqIdAndVendor_UserId(Long rfqId, Long vendorId);
 
     Optional<RFQQuotation> findByQuotationIdAndVendor_UserId(Long quotationId, Long vendorId);
+    List<RFQQuotation> findByRfq_RfqId(Long rfqId);
 }

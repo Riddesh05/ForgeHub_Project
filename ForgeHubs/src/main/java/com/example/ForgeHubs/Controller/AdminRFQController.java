@@ -1,18 +1,18 @@
 package com.example.ForgeHubs.Controller;
 
 import com.example.ForgeHubs.DTO.RFQCreateRequest;
-import com.example.ForgeHubs.Entity.RFQ;
-import com.example.ForgeHubs.Entity.RFQItem;
+import com.example.ForgeHubs.DTO.RFQItemUpdateRequest;
+import com.example.ForgeHubs.DTO.RFQResponseDto;
 import com.example.ForgeHubs.Service.RFQService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin/rfq")
 @RequiredArgsConstructor
@@ -54,6 +54,7 @@ public class AdminRFQController {
             return "redirect:/admin/rfq/list";
 
         } catch (Exception e) {
+            log.error("Request failed unexpectedly", e);
 
             model.addAttribute("error", e.getMessage());
             model.addAttribute("vendors", rfqService.getAllVendors());
@@ -80,41 +81,8 @@ public class AdminRFQController {
 
     @GetMapping("/details/{id}")
     @ResponseBody
-    public RFQDetailsResponse getRFQDetails(
-            @PathVariable Integer id
-    ) {
-
-        RFQ rfq = rfqService.getRFQById(id);
-
-        List<RFQItem> items = rfqService.getRFQItems(id);
-
-        List<RFQItemResponse> itemResponses = items.stream()
-                .map(item -> new RFQItemResponse(
-                        item.getItemId(),
-                        item.getRfqLineNo(),
-                        item.getItemNo(),
-                        item.getItemName(),
-                        item.getReqQty(),
-                        item.getUom(),
-                        item.getReqDeliveryDate(),
-                        item.getDeliveryLocation(),
-                        item.getFactoryCode(),
-                        item.getDescription()
-                ))
-                .toList();
-
-        return new RFQDetailsResponse(
-                rfq.getRfqId(),
-                rfq.getRfqNo(),
-                rfq.getIndentNo(),
-                rfq.getContactPerson(),
-                rfq.getMobile(),
-                rfq.getBidDate(),
-                rfq.getExpiryDateOfBid(),
-                rfq.getStatus() != null ? rfq.getStatus().name() : null,
-                Boolean.TRUE.equals(rfq.getIsDeleted()),
-                itemResponses
-        );
+    public RFQResponseDto getRFQDetails(@PathVariable Long id) {
+        return rfqService.getRFQById(id);
     }
 
     // =========================================================
@@ -123,7 +91,7 @@ public class AdminRFQController {
 
     @PostMapping("/update/{id}")
     public String updateRFQ(
-            @PathVariable Integer id,
+            @PathVariable Long id,
             @ModelAttribute RFQCreateRequest request,
             @RequestParam(name = "action", defaultValue = "submit") String action
     ) {
@@ -142,25 +110,10 @@ public class AdminRFQController {
     @PostMapping("/item/update")
     @ResponseBody
     public ResponseEntity<String> updateRFQItem(
-
-            @RequestParam Integer itemId,
-            @RequestParam String itemName,
-            @RequestParam Integer reqQty,
-            @RequestParam String uom,
-            @RequestParam String reqDeliveryDate,
-            @RequestParam String deliveryLocation,
-            @RequestParam(required = false, defaultValue = "") String description
+            @ModelAttribute RFQItemUpdateRequest request
     ) {
 
-        rfqService.updateRFQItem(
-                itemId,
-                itemName,
-                reqQty,
-                uom,
-                LocalDate.parse(reqDeliveryDate),
-                deliveryLocation,
-                description
-        );
+        rfqService.updateRFQItem(request);
 
         return ResponseEntity.ok("success");
     }
@@ -170,7 +123,7 @@ public class AdminRFQController {
     // =========================================================
 
     @PostMapping("/delete/{id}")
-    public String deleteRFQ(@PathVariable Integer id) {
+    public String deleteRFQ(@PathVariable Long id) {
 
         rfqService.softDeleteRFQ(id);
 
@@ -182,42 +135,11 @@ public class AdminRFQController {
     // =========================================================
 
     @PostMapping("/rebid/{id}")
-    public String openToRebid(@PathVariable Integer id) {
+    public String openToRebid(@PathVariable Long id) {
 
         rfqService.openToRebid(id);
 
         return "redirect:/admin/rfq/list";
     }
 
-    // =========================================================
-    // RESPONSE DTOs
-    // =========================================================
-
-    public record RFQDetailsResponse(
-            Long rfqId,
-            String rfqNo,
-            String indentNo,
-            String contactPerson,
-            String mobile,
-            java.time.LocalDateTime bidDate,
-            java.time.LocalDateTime expiryDateOfBid,
-            String status,
-            boolean deleted,
-            List<RFQItemResponse> items
-    ) {
-    }
-
-    public record RFQItemResponse(
-            Long itemId,
-            Integer rfqLineNo,
-            String itemNo,
-            String itemName,
-            Integer reqQty,
-            String uom,
-            LocalDate reqDeliveryDate,
-            String deliveryLocation,
-            String factoryCode,
-            String description
-    ) {
-    }
 }
