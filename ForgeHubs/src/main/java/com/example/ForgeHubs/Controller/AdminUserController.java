@@ -41,9 +41,7 @@ public class AdminUserController {
         }
 
         try {
-
             userService.createVendor(request);
-
             return "redirect:/admin/users?success";
 
         } catch (RuntimeException e) {
