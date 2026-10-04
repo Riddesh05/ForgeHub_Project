@@ -22,4 +22,5 @@ public class FinalizedQuotationResponseDto {
     private Long quotationId;
     private BigDecimal quotedAmount;
     private LocalDateTime finalizedDate;
+    private String bidNo;
 }

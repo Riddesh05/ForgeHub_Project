@@ -132,9 +132,12 @@ public class AdminSectionController {
     @GetMapping("/finance-quotation")
     public String financeQuotation(Model model) {
 
-        model.addAttribute("title", "Finance Quotation");
-
-        return "admin/section-placeholder";
+        //model.addAttribute("title", "Finance Quotation");
+        model.addAttribute(
+                "quotations",
+                vendorService.getAllFinalizedQuotations()
+        );
+        return "admin/finance-quotation";
     }
 
     // =========================================================

@@ -446,16 +446,26 @@ public class VendorServiceImpl implements VendorService {
         finalizedQuotationRepository.save(finalized);
     }
 
+//    @Override
+//    @Transactional
+//    public List<FinalizedQuotationResponseDto>  getAllFinalizedQuotations() {
+//        return finalizedQuotationRepository.findAllByOrderByFinalizedDateDesc()
+//                .stream()
+//                .peek(item -> {
+//                    if (item.getRfq() != null && item.getRfq().getItems() != null) {
+//                        item.getRfq().getItems().size();
+//                    }
+//                })
+//                .map(quotationResponseMapper::toFinalizedQuotationResponse)
+//                .toList();
+//    }
+
     @Override
-    @Transactional
     public List<FinalizedQuotationResponseDto> getAllFinalizedQuotations() {
-        return finalizedQuotationRepository.findAllByOrderByFinalizedDateDesc()
+
+        return finalizedQuotationRepository
+                .findAllByOrderByFinalizedDateDesc()
                 .stream()
-                .peek(item -> {
-                    if (item.getRfq() != null && item.getRfq().getItems() != null) {
-                        item.getRfq().getItems().size();
-                    }
-                })
                 .map(quotationResponseMapper::toFinalizedQuotationResponse)
                 .toList();
     }
