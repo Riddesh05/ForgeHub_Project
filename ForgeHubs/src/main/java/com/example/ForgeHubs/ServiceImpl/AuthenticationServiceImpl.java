@@ -34,10 +34,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public LoginResponseDto login(LoginRequestDto requestDto) {
         User user = userRepo.findByEmail(requestDto.getEmail());
 
+        System.out.println("LOGIN EMAIL = [" + requestDto.getEmail() + "]");
         if (user == null) {
             throw new AuthenticationException("Invalid email");
         }
-
+        System.out.println("USER FOUND = " + user);
         if (requestDto.getAuthenticatorOtp() == null ||
                 requestDto.getAuthenticatorOtp().isBlank()) {
 
@@ -189,6 +190,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResponseDto recoverTwoFactor(String email, String emailOtp, String authenticatorOtp) {
         User user = userRepo.findByEmail(email);
+
 
         if (user == null) {
             throw new AuthenticationException("Invalid recovery request");

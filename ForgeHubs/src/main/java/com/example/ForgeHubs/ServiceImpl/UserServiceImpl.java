@@ -1,7 +1,6 @@
 package com.example.ForgeHubs.ServiceImpl;
 
 
-import com.example.ForgeHubs.DTO.UserCreateRequest;
 import com.example.ForgeHubs.DTO.UserRequestDto;
 import com.example.ForgeHubs.DTO.UserResponseDto;
 import com.example.ForgeHubs.Entity.User;
@@ -54,10 +53,6 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    @Override
-    public void createVendor(UserCreateRequest request) {
-
-    }
 
     @Override
     public List<User> getAllUsers() {
