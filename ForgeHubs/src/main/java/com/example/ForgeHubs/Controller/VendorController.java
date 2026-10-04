@@ -169,7 +169,6 @@ public class VendorController {
                 row.put("availableQty", item.getAvailableQty());
                 row.put("uom", item.getUom());
                 row.put("unitPrice", item.getUnitPrice());
-                row.put("otherCharges", item.getOtherCharges());
                 row.put("subtotal", item.getItemSubtotal() != null
                         ? item.getItemSubtotal()
                         : item.getSubtotal());
@@ -196,10 +195,7 @@ public class VendorController {
                         ? BigDecimal.ZERO
                         : quotation.getGrandTotal()
         );
-        model.addAttribute(
-                "quotationRemarks",
-                quotation.getRemarks() == null ? "" : quotation.getRemarks()
-        );
+
     }
 
     @GetMapping("/finalized-quotation")

@@ -16,6 +16,6 @@ import java.util.List;
 public class VendorQuotationRequest {
     private LocalDate deliveryDate;
     private String paymentTerms;
-    private String remarks;
+    //private String remarks;
     private List<VendorQuotationItemRequest> items = new ArrayList<>();
 }

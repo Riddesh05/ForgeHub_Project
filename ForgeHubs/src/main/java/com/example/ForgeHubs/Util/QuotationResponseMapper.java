@@ -59,7 +59,6 @@ public class QuotationResponseMapper {
                 .grandTotal(parsed.grandTotal())
                 .deliveryDate(quotation.getDeliveryDate())
                 .paymentTerms(quotation.getPaymentTerms())
-                .remarks(parsed.remarks())
                 .status(quotation.getStatus())
                 .submittedDate(quotation.getSubmittedDate())
                 .items(parsed.items())
@@ -115,7 +114,6 @@ public class QuotationResponseMapper {
                                 .availableQty(item.path("availableQty").asInt())
                                 .uom(item.path("uom").asText("-"))
                                 .unitPrice(item.has("unitPrice") ? item.get("unitPrice").decimalValue() : BigDecimal.ZERO)
-                                .otherCharges(item.has("otherCharges") ? item.get("otherCharges").decimalValue() : BigDecimal.ZERO)
                                 .itemSubtotal(itemSubtotal)
                                 .subtotal(lineSubtotal)
                                 .build());

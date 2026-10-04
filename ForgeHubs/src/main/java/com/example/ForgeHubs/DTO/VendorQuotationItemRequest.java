@@ -15,5 +15,5 @@ public class VendorQuotationItemRequest {
     private Long itemId;
     private Integer availableQty;
     private BigDecimal unitPrice;
-    private BigDecimal otherCharges;
+   // private BigDecimal otherCharges;
 }

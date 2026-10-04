@@ -181,23 +181,12 @@ public class VendorServiceImpl implements VendorService {
                 );
             }
 
-            BigDecimal otherCharges = itemRequest.getOtherCharges() == null
-                    ? BigDecimal.ZERO
-                    : itemRequest.getOtherCharges();
-
-            if (otherCharges.compareTo(BigDecimal.ZERO) < 0) {
-                throw new BusinessException(
-                        "Other charges cannot be negative for item: " + item.getItemName()
-                );
-            }
 
             BigDecimal itemSubtotal = unitPrice
                     .multiply(BigDecimal.valueOf(availableQty))
                     .setScale(4, RoundingMode.HALF_UP);
 
-            BigDecimal lineSubtotal = itemSubtotal
-                    .add(otherCharges)
-                    .setScale(4, RoundingMode.HALF_UP);
+            BigDecimal lineSubtotal = itemSubtotal;
 
             subtotal = subtotal.add(lineSubtotal);
 
@@ -208,7 +197,6 @@ public class VendorServiceImpl implements VendorService {
             line.put("availableQty", availableQty);
             line.put("uom", item.getUom());
             line.put("unitPrice", unitPrice);
-            line.put("otherCharges", otherCharges);
             line.put("itemSubtotal", itemSubtotal);
             line.put("subtotal", lineSubtotal);
 
@@ -229,7 +217,6 @@ public class VendorServiceImpl implements VendorService {
         storedDetails.put("gstAmount", gst);
         storedDetails.put("grandTotal", grandTotal);
         storedDetails.put("items", quotationItems);
-        storedDetails.put("remarks", request.getRemarks());
 
         String detailsJson;
 

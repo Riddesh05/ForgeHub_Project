@@ -18,7 +18,7 @@ public class VendorQuotationItemResponseDto {
     private Integer availableQty;
     private String uom;
     private BigDecimal unitPrice;
-    private BigDecimal otherCharges;
+   // private BigDecimal otherCharges;
     private BigDecimal itemSubtotal;
     private BigDecimal subtotal;
 }

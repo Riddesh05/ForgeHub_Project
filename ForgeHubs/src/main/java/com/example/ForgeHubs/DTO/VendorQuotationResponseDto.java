@@ -34,7 +34,7 @@ public class VendorQuotationResponseDto {
 
     private LocalDate deliveryDate;
     private String paymentTerms;
-    private String remarks;
+  //  private String remarks;
     private String status;
     private LocalDateTime submittedDate;
 
