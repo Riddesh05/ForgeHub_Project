@@ -25,36 +25,20 @@ public class UserServiceImpl implements UserService {
   //  private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional
-    public UserResponseDto addUser(UserRequestDto request) {
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessException("A user with this email already exists. Please use a different email address.");
-        }
-
-        User user = modelMapper.map(request, User.class);
-        user.setRole(request.getRole() == null ? UserRole.VENDOR : request.getRole());
-        user.setIsFirstTimeLogin(true);
-        user.setSecretKey(null);
-
-        return modelMapper.map(userRepository.save(user), UserResponseDto.class);
+    public UserResponseDto addUser(UserRequestDto userRequestDto) {
+        return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserResponseDto getUserById(Long id) {
-        return userRepository.findById(id)
-                .map(user -> modelMapper.map(user, UserResponseDto.class))
-                .orElseThrow(() -> new BusinessException("User not found with ID: " + id));
+        return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserResponseDto getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .map(user -> modelMapper.map(user, UserResponseDto.class))
-                .orElseThrow(() -> new BusinessException("User not found with email: " + email));
+        return null;
     }
+
 
     @Override
     @Transactional
