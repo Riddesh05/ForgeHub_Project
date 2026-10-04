@@ -1,0 +1,66 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"7184a611-18b4-4cb0-8415-ca86e731d2b9\" name=\"Changes\" comment=\"commit\" />\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Interface\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\r\n  \"lastFilter\": {\r\n    \"state\": \"OPEN\",\r\n    \"assignee\": \"Riddesh05\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/Riddesh05/ForgeHub_Project.git\",\r\n    \"accountId\": \"cb695de4-8b91-49d7-bd05-e6ca4f3dd81d\"\r\n  }\r\n}]]></component>\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"customColor\": \"\",\r\n  \"associatedIndex\": 7\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"3K3Im57vQSdYsxwykKGHeeTOSL8\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"git-widget-placeholder\": \"master\",\r\n    \"kotlin-language-version-configured\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"7184a611-18b4-4cb0-8415-ca86e731d2b9\" name=\"Changes\" comment=\"\" />\r\n      <created>1790779984895</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1790779984895</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"commit\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1790780461864</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1790780461864</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"commit\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1790780649292</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1790780649292</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"commit\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1790780755266</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1790780755266</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"commit\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1790780860009</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1790780860009</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"5\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"commit\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"commit\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 82cecc56d2373993c94e89d4828f4b692a578db9)
++++ b/.idea/workspace.xml	(date 1791027201627)
+@@ -19,24 +19,29 @@
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="authentication" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-  "lastFilter": {
+-    "state": "OPEN",
+-    "assignee": "Riddesh05"
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;Riddesh05&quot;
+   }
+-}]]></component>
+-  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-  "selectedUrlAndAccountId": {
+-    "url": "https://github.com/Riddesh05/ForgeHub_Project.git",
+-    "accountId": "cb695de4-8b91-49d7-bd05-e6ca4f3dd81d"
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/Riddesh05/ForgeHub_Project.git&quot;,
++    &quot;accountId&quot;: &quot;cb695de4-8b91-49d7-bd05-e6ca4f3dd81d&quot;
+   }
+-}]]></component>
+-  <component name="ProjectColorInfo"><![CDATA[{
+-  "customColor": "",
+-  "associatedIndex": 7
+-}]]></component>
++}</component>
++  <component name="ProjectColorInfo">{
++  &quot;customColor&quot;: &quot;&quot;,
++  &quot;associatedIndex&quot;: 7
++}</component>
+   <component name="ProjectId" id="3K3Im57vQSdYsxwykKGHeeTOSL8" />
+   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+   <component name="ProjectViewState">
+@@ -45,9 +50,10 @@
+   </component>
+   <component name="PropertiesComponent"><![CDATA[{
+   "keyToString": {
++    "Application.ForgeHubsApplication.executor": "Run",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "git-widget-placeholder": "master",
++    "git-widget-placeholder": "authentication",
+     "kotlin-language-version-configured": "true"
+   }
+ }]]></component>

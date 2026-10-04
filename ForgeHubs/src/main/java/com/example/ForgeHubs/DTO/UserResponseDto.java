@@ -18,6 +18,7 @@ public class UserResponseDto {
     private String email;
     private UserRole role;
     private boolean isFirstTimeLogin;
+    private boolean totpConfigured;
     private String token;
     private String refreshToken;
 
