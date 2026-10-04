@@ -31,7 +31,7 @@ public class ModelMapperConfig {
         userMap.setPostConverter(context -> {
             User source = context.getSource();
             UserResponseDto destination = context.getDestination();
-            destination.setFirstTimeLogin(Boolean.TRUE.equals(source.getIsFirstTimeLogin()));
+            destination.setFirstTimeLogin(Boolean.TRUE.equals(source.isFirstTimeLogin()));
             destination.setTotpConfigured(
                     source.getSecretKey() != null && !source.getSecretKey().isBlank()
             );

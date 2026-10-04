@@ -6,7 +6,6 @@ import com.example.ForgeHubs.Entity.RFQItem;
 import com.example.ForgeHubs.Entity.RFQVendor;
 import com.example.ForgeHubs.Entity.User;
 import com.example.ForgeHubs.Exception.BusinessException;
-import com.example.ForgeHubs.Exception.ResourceNotFoundException;
 import com.example.ForgeHubs.Repository.RFQItemRepository;
 import com.example.ForgeHubs.Repository.RFQRepository;
 import com.example.ForgeHubs.Repository.RFQVendorRepository;
@@ -14,6 +13,7 @@ import com.example.ForgeHubs.Repository.UserRepository;
 import com.example.ForgeHubs.Service.RFQService;
 import com.example.ForgeHubs.enums.RFQStatus;
 import com.example.ForgeHubs.enums.UserRole;
+import com.example.ForgeHubs.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -80,7 +80,7 @@ public class RFQServiceImpl implements RFQService {
 
         User admin = userRepository.findById(adminUserId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
+                        new com.example.ForgeHubs.exception.ResourceNotFoundException(
                                 "Admin user was not found. Please sign in again."
                         )
                 );

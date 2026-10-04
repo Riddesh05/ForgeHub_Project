@@ -5,16 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7184a611-18b4-4cb0-8415-ca86e731d2b9" name="Changes" comment="commits">
+      <change afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/fragments/admin-sidebar.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminSectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminSectionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/VendorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/VendorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationItemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationItemRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationItemResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationItemResponseDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationResponseDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/DTO/VendorQuotationResponseDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Exception/ResourceNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Exception/ResourceNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/UserServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/VendorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/VendorServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Util/QuotationResponseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/Util/QuotationResponseMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/rfq-details.html" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/resources/templates/vendor/rfq-details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/config/ModelMapperConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/ForgeHubs/src/main/java/com/example/ForgeHubs/config/ModelMapperConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,19 +65,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.ForgeHubsApplication.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JUnit.ForgeHubsApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;capex&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/ForgeHub_Project/ForgeHubs&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.ForgeHubsApplication.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.ForgeHubsApplicationTests.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "test",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/ForgeHub_Project/ForgeHubs"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\ForgeHub_Project\ForgeHubs" />
@@ -118,8 +118,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ForgeHubsApplicationTests" />
         <item itemvalue="Application.ForgeHubsApplication" />
+        <item itemvalue="JUnit.ForgeHubsApplicationTests" />
         <item itemvalue="Application.ForgeHubsApplication" />
         <item itemvalue="JUnit.ForgeHubsApplicationTests" />
         <item itemvalue="Application.ForgeHubsApplication" />
@@ -225,6 +225,17 @@
     </task>
     <option name="localTasksCounter" value="12" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="commit" />

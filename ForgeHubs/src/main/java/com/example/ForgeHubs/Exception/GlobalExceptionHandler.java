@@ -1,5 +1,6 @@
-package com.example.ForgeHubs.Exception;
+package com.example.ForgeHubs.exception;
 
+import com.example.ForgeHubs.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,8 @@ public class GlobalExceptionHandler {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request, model);
     }
 
-    @ExceptionHandler(BusinessException.class)
-    public Object handleBusiness(BusinessException ex, HttpServletRequest request, Model model) {
+    @ExceptionHandler(com.example.ForgeHubs.Exception.BusinessException.class)
+    public Object handleBusiness(com.example.ForgeHubs.Exception.BusinessException ex, HttpServletRequest request, Model model) {
         log.warn("Business exception | method={} path={} message={}", request.getMethod(), request.getRequestURI(), ex.getMessage());
         return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request, model);
     }
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler {
 
     private Object buildResponse(String message, HttpStatus status, HttpServletRequest request, Model model) {
         if (isApiRequest(request)) {
-            return ResponseEntity.status(status).body(new ErrorResponse(
+            return ResponseEntity.status(status).body(new com.example.ForgeHubs.Exception.ErrorResponse(
                     LocalDateTime.now(), status.value(), status.getReasonPhrase(), message, request.getRequestURI()));
         }
         model.addAttribute("status", status.value());

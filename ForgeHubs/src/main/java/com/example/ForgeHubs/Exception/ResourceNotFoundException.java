@@ -1,4 +1,4 @@
-package com.example.ForgeHubs.Exception;
+package com.example.ForgeHubs.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

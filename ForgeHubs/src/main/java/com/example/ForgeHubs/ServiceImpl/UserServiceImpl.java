@@ -39,14 +39,14 @@ public class UserServiceImpl implements UserService {
                 .isFirstTimeLogin(true)
                 .twoFactorEnabled(false)
                 .build();
-        User saved  = repo.save(user);
+        User saved  = userRepository.save(user);
         return  mapper.map(saved,UserResponseDto.class);
     }
 
     @Override
     public UserResponseDto getUserById(Long id) {
-        if(repo.findById(id).isPresent()){
-            return mapper.map(repo.findById(id).get(),UserResponseDto.class);
+        if(userRepository.findById(id).isPresent()){
+            return mapper.map(userRepository.findById(id).get(),UserResponseDto.class);
 
         }
         return null;
@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getUserByEmail(String email) {
-        if(repo.findByEmail(email)!=null){
-            return mapper.map(repo.findByEmail(email),UserResponseDto.class);
+        if(userRepository.findByEmail(email)!=null){
+            return mapper.map(userRepository.findByEmail(email),UserResponseDto.class);
         }
         return null;
     }
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-        User user = modelMapper.map(request, User.class);
+        User user = mapper.map(request, User.class);
 
         // Temporary password must be stored as hash
 
@@ -81,20 +81,20 @@ public class UserServiceImpl implements UserService {
         user.setRole(UserRole.VENDOR);
 
         // Newly created vendor has first-time login pending
-        user.setIsFirstTimeLogin(true);
+        user.setFirstTimeLogin(true);
 
         // 2FA secret will be generated/configured
         // during first-time authentication flow.
         user.setSecretKey(null);
 
-        return modelMapper.map(userRepository.save(user), UserResponseDto.class);
+        return mapper.map(userRepository.save(user), UserResponseDto.class);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(user -> modelMapper.map(user, UserResponseDto.class))
+                .map(user -> mapper.map(user, UserResponseDto.class))
                 .toList();
     }
 }

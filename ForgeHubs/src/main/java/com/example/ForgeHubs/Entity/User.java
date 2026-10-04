@@ -39,12 +39,15 @@ import com.example.ForgeHubs.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "Users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -85,7 +88,7 @@ public class User {
             name = "is_first_time_login",
             nullable = false
     )
-    private Boolean isFirstTimeLogin;
+    private boolean isFirstTimeLogin;
     private String token;
     private String refreshToken;
     private boolean twoFactorEnabled;
@@ -96,7 +99,6 @@ public class User {
     private String recoveryOtp;
 
     private LocalDateTime recoveryOtpExpiry;
-
 
 
 
