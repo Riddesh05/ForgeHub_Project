@@ -10,9 +10,9 @@ public interface RFQQuotationRepository extends JpaRepository<RFQQuotation, Inte
 
     List<RFQQuotation> findAllByOrderBySubmittedDateDesc();
 
-    List<RFQQuotation> findByVendor_UserIdOrderBySubmittedDateDesc(Integer vendorId);
+    List<RFQQuotation> findByVendor_UserIdOrderBySubmittedDateDesc(Long vendorId);
 
-    Optional<RFQQuotation> findByRfq_RfqIdAndVendor_UserId(Integer rfqId, Integer vendorId);
+    Optional<RFQQuotation> findByRfq_RfqIdAndVendor_UserId(Integer rfqId, Long vendorId);
 
-    Optional<RFQQuotation> findByQuotationIdAndVendor_UserId(Integer quotationId, Integer vendorId);
+    Optional<RFQQuotation> findByQuotationIdAndVendor_UserId(Integer quotationId, Long vendorId);
 }

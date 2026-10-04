@@ -1,11 +1,28 @@
 package com.example.ForgeHubs.ServiceImpl;
 
 
+import com.example.ForgeHubs.DTO.UserCreateRequest;
 import com.example.ForgeHubs.DTO.UserRequestDto;
 import com.example.ForgeHubs.DTO.UserResponseDto;
+import com.example.ForgeHubs.Entity.User;
+import com.example.ForgeHubs.Repository.UserRepo;
 import com.example.ForgeHubs.Service.UserService;
+import com.example.ForgeHubs.config.PasswordEncoderConfig;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final PasswordEncoder  encoder;
+    private final ModelMapper mapper;
+    private final UserRepo repo;
+
     @Override
     public UserResponseDto addUser(UserRequestDto userRequestDto) {
         User user = User.builder()
@@ -35,5 +52,15 @@ public class UserServiceImpl implements UserService {
             return mapper.map(repo.findByEmail(email),UserResponseDto.class);
         }
         return null;
+    }
+
+    @Override
+    public void createVendor(UserCreateRequest request) {
+
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return List.of();
     }
 }

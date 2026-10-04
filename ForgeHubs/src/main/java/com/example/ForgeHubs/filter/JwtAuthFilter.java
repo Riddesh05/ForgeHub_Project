@@ -17,37 +17,65 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
+
     private static final String BEARER = "Bearer ";
 
+    private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
-        if(header == null || !header.startsWith(BEARER)) {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader == null ||
+                !authorizationHeader.startsWith(BEARER)) {
+
             filterChain.doFilter(request, response);
             return;
         }
-        String token = header.substring(7);
+
+        String token = authorizationHeader.substring(BEARER.length());
 
         try {
 
+            String tokenType = jwtService.extractTokenType(token);
+
+            if (!"access".equals(tokenType)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
             String email = jwtService.extractSubject(token);
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (email == null || email.isBlank()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken( email, null, List.of());
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                email,
+                                null,
+                                List.of()
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
         } catch (Exception e) {
+
+            SecurityContextHolder.clearContext();
+
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         filterChain.doFilter(request, response);
     }
-
 }

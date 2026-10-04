@@ -11,19 +11,19 @@ import java.util.List;
 
 public interface VendorService {
 
-    User getVendor(Integer vendorId);
+    User getVendor(Long vendorId);
 
-    List<RFQ> getOpenRfqs(Integer vendorId);
+    List<RFQ> getOpenRfqs(Long vendorId);
 
-    RFQ getAssignedRfq(Integer rfqId, Integer vendorId);
+    RFQ getAssignedRfq(Integer rfqId, Long vendorId);
 
-    void submitQuotation(Integer rfqId, Integer vendorId, VendorQuotationRequest request);
+    void submitQuotation(Integer rfqId, Long vendorId, VendorQuotationRequest request);
 
-    List<RFQQuotation> getMySubmissions(Integer vendorId);
+    List<RFQQuotation> getMySubmissions(Long vendorId);
 
-    RFQQuotation getMySubmission(Integer quotationId, Integer vendorId);
+    RFQQuotation getMySubmission(Integer quotationId, Long vendorId);
 
-    List<FinalizedQuotation> getFinalizedQuotations(Integer vendorId);
+    List<FinalizedQuotation> getFinalizedQuotations(Long vendorId);
 
     // Admin-side quotation flow
     List<RFQQuotation> getAllVendorQuotations();

@@ -33,11 +33,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResponseDto login(LoginRequestDto requestDto) {
         User user = userRepo.findByEmail(requestDto.getEmail());
+
         if (user == null) {
-            throw new AuthenticationException("Invalid email or password");
+            throw new AuthenticationException("Invalid email");
         }
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new AuthenticationException("Invalid password");
+
+        if (requestDto.getAuthenticatorOtp() == null ||
+                requestDto.getAuthenticatorOtp().isBlank()) {
+
+            if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+
+                throw new AuthenticationException("Invalid password");
+            }
         }
 
         if (!user.isTwoFactorEnabled()) {
@@ -273,5 +280,44 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         throw new AuthenticationException("Recovery verification required");
+    }
+
+    @Override
+    public LoginResponseDto refreshToken(String refreshToken) {
+
+        try {
+
+            String type = jwtService.extractTokenType(refreshToken);
+
+            if (!"refresh".equals(type)) {
+                throw new AuthenticationException("Invalid refresh token");
+            }
+
+            String email = jwtService.extractSubject(refreshToken);
+
+            User user = userRepo.findByEmail(email);
+
+            if (user == null) {
+                throw new AuthenticationException("User not found");
+            }
+
+            String accessToken = jwtService.generateToken(
+                    user.getEmail(),
+                    user.getRole().name()
+            );
+
+            return LoginResponseDto.builder()
+                    .requiresTwoFactorSetup(false)
+                    .requiresTwoFactor(false)
+                    .qrCode(null)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+
+        } catch (Exception e) {
+            throw new AuthenticationException(
+                    "Invalid or expired refresh token"
+            );
+        }
     }
 }

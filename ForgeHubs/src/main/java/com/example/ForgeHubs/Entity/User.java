@@ -1,10 +1,7 @@
 package com.example.ForgeHubs.Entity;
 
 import com.example.ForgeHubs.enums.UserRole;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,15 +17,33 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
-    private String name ;
+
+    private String name;
+
     private String email;
+
     private String password;
+
+    @Enumerated(EnumType.STRING)
     private UserRole role;
+
     private boolean isFirstTimeLogin;
+
     private String token;
+
     private String refreshToken;
+
+    private boolean twoFactorEnabled;
+
+    private String twoFactorSecret;
+
+    private String pendingTwoFactorSecret;
+
+    private String recoveryOtp;
+
+    private LocalDateTime recoveryOtpExpiry;
 
 
 

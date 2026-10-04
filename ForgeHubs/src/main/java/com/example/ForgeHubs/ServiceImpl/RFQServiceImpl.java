@@ -9,7 +9,7 @@ import com.example.ForgeHubs.Entity.User;
 import com.example.ForgeHubs.Repository.RFQItemRepository;
 import com.example.ForgeHubs.Repository.RFQRepository;
 import com.example.ForgeHubs.Repository.RFQVendorRepository;
-import com.example.ForgeHubs.Repository.UserRepository;
+import com.example.ForgeHubs.Repository.UserRepo;
 import com.example.ForgeHubs.Service.RFQService;
 import com.example.ForgeHubs.enums.RFQStatus;
 import com.example.ForgeHubs.enums.UserRole;
@@ -29,7 +29,7 @@ public class RFQServiceImpl implements RFQService {
     private final RFQRepository rfqRepository;
     private final RFQItemRepository rfqItemRepository;
     private final RFQVendorRepository rfqVendorRepository;
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
 
 
     // =========================================================
@@ -72,7 +72,7 @@ public class RFQServiceImpl implements RFQService {
     @Transactional
     public void saveRfq(
             RFQCreateRequest request,
-            Integer adminUserId,
+            Long adminUserId,
             boolean draft
     ) {
 
@@ -201,7 +201,7 @@ public class RFQServiceImpl implements RFQService {
 
         if (request.getVendorIds() != null) {
 
-            for (Integer vendorId
+            for (Long vendorId
                     : request.getVendorIds()) {
 
                 User vendor = userRepository.findById(vendorId)
@@ -216,7 +216,7 @@ public class RFQServiceImpl implements RFQService {
 
                     throw new RuntimeException(
                             "Selected user is not a vendor: "
-                                    + vendor.getFullName()
+                                    + vendor.getName()
                     );
                 }
 

@@ -21,7 +21,7 @@ public class AdminRFQController {
     private final RFQService rfqService;
 
     // Temporary admin ID until authentication branch is merged.
-    private static final Integer TEST_ADMIN_ID = 1;
+    private static final Long TEST_ADMIN_ID = 1L;
 
     // =========================================================
     // ADD RFQ

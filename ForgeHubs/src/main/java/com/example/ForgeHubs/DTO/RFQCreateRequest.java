@@ -25,5 +25,5 @@ public class RFQCreateRequest {
 
     private List<RFQItemRequest> items = new ArrayList<>();
 
-    private List<Integer> vendorIds = new ArrayList<>();
+    private List<Long> vendorIds = new ArrayList<>();
 }

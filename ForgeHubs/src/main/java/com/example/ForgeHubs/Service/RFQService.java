@@ -14,7 +14,7 @@ public interface RFQService {
 
     String generateIndentNo();
 
-    void saveRfq(RFQCreateRequest request, Integer adminUserId, boolean draft);
+    void saveRfq(RFQCreateRequest request, Long adminUserId, boolean draft);
 
     List<User> getAllVendors();
 

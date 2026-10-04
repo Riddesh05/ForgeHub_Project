@@ -125,7 +125,7 @@ public class AdminSectionController {
                 quotation.getQuotationId(),
                 quotation.getBidNo(),
                 quotation.getRfq() != null ? quotation.getRfq().getRfqNo() : "-",
-                quotation.getVendor() != null ? quotation.getVendor().getFullName() : "-",
+                quotation.getVendor() != null ? quotation.getVendor().getName() : "-",
                 quotation.getVendor() != null ? quotation.getVendor().getEmail() : "-",
                 grandTotal,
                 subtotal,

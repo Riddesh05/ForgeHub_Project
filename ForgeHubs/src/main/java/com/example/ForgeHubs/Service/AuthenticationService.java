@@ -12,4 +12,7 @@ public interface AuthenticationService {
     public void sendRecoveryOtp(String email);
 
     public LoginResponseDto recoverTwoFactor( String email, String emailOtp, String authenticatorOtp );
+
+    LoginResponseDto refreshToken(String refreshToken);
+
 }

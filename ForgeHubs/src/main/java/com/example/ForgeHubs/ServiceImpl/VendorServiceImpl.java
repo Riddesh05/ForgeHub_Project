@@ -10,7 +10,7 @@ import com.example.ForgeHubs.Entity.User;
 import com.example.ForgeHubs.Repository.FinalizedQuotationRepository;
 import com.example.ForgeHubs.Repository.RFQQuotationRepository;
 import com.example.ForgeHubs.Repository.RFQVendorRepository;
-import com.example.ForgeHubs.Repository.UserRepository;
+import com.example.ForgeHubs.Repository.UserRepo;
 import com.example.ForgeHubs.Service.VendorService;
 import com.example.ForgeHubs.enums.RFQStatus;
 import com.example.ForgeHubs.enums.UserRole;
@@ -36,19 +36,19 @@ public class VendorServiceImpl implements VendorService {
     private static final BigDecimal GST_RATE = new BigDecimal("0.10");
     private static final String QUOTATION_JSON_PREFIX = "FORGEHUB_QUOTATION_V1:";
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
     private final RFQVendorRepository rfqVendorRepository;
     private final RFQQuotationRepository rfqQuotationRepository;
     private final FinalizedQuotationRepository finalizedQuotationRepository;
     private final ObjectMapper objectMapper;
 
     @Override
-    public User getVendor(Integer vendorId) {
+    public User getVendor(Long vendorId) {
         User vendor = userRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found: " + vendorId));
 
         if (vendor.getRole() != UserRole.VENDOR) {
-            throw new RuntimeException("Selected user is not a vendor: " + vendor.getFullName());
+            throw new RuntimeException("Selected user is not a vendor: " + vendor.getName());
         }
 
         return vendor;
@@ -56,7 +56,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQ> getOpenRfqs(Integer vendorId) {
+    public List<RFQ> getOpenRfqs(Long vendorId) {
         getVendor(vendorId);
 
         List<RFQ> rfqs = rfqVendorRepository.findActiveAssignedRfqs(vendorId);
@@ -80,7 +80,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public RFQ getAssignedRfq(Integer rfqId, Integer vendorId) {
+    public RFQ getAssignedRfq(Integer rfqId, Long vendorId) {
         getVendor(vendorId);
 
         if (!rfqVendorRepository.existsByRfq_RfqIdAndVendor_UserId(rfqId, vendorId)) {
@@ -107,7 +107,7 @@ public class VendorServiceImpl implements VendorService {
     @Transactional
     public void submitQuotation(
             Integer rfqId,
-            Integer vendorId,
+            Long vendorId,
             VendorQuotationRequest request
     ) {
         User vendor = getVendor(vendorId);
@@ -222,14 +222,14 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<RFQQuotation> getMySubmissions(Integer vendorId) {
+    public List<RFQQuotation> getMySubmissions(Long vendorId) {
         getVendor(vendorId);
         return rfqQuotationRepository.findByVendor_UserIdOrderBySubmittedDateDesc(vendorId);
     }
 
     @Override
     @Transactional
-    public RFQQuotation getMySubmission(Integer quotationId, Integer vendorId) {
+    public RFQQuotation getMySubmission(Integer quotationId, Long vendorId) {
         getVendor(vendorId);
         RFQQuotation quotation = rfqQuotationRepository
                 .findByQuotationIdAndVendor_UserId(quotationId, vendorId)
@@ -244,7 +244,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Transactional
-    public List<FinalizedQuotation> getFinalizedQuotations(Integer vendorId) {
+    public List<FinalizedQuotation> getFinalizedQuotations(Long vendorId) {
         getVendor(vendorId);
         List<FinalizedQuotation> finalized = finalizedQuotationRepository
                 .findByQuotation_Vendor_UserIdOrderByFinalizedDateDesc(vendorId);
