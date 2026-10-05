@@ -1,4 +1,4 @@
-package com.example.ForgeHubs.Exception;
+package com.example.ForgeHubs.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

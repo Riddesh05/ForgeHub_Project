@@ -1,4 +1,4 @@
-package com.example.ForgeHubs.Exception;
+package com.example.ForgeHubs.exception;
 
 public class BusinessException extends RuntimeException {
     public BusinessException(String message) {
