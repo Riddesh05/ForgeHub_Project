@@ -77,6 +77,9 @@
       <recent name="D:\ForgeHub_Project\ForgeHubs\src\main\java\com\example\ForgeHubs" />
       <recent name="D:\ForgeHub_Project\ForgeHubs\src\main\resources" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ForgeHub_Project\ForgeHubs\src\main\resources\static\css" />
+    </key>
   </component>
   <component name="RunManager" selected="Application.ForgeHubsApplication">
     <configuration name="ForgeHubsApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -222,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1791187521749</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="commits">
+      <option name="closed" value="true" />
+      <created>1791191949110</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1791191949110</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

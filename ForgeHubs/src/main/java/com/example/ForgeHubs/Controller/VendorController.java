@@ -2,8 +2,10 @@ package com.example.ForgeHubs.Controller;
 
 import com.example.ForgeHubs.DTO.*;
 import com.example.ForgeHubs.Service.VendorService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -111,7 +113,7 @@ public class VendorController {
                         .findFirst()
                         .ifPresent(s -> {
                             if (s.getHistory() != null) {
-                                s.getHistory().add(new com.example.ForgeHubs.DTO.VendorQuotationHistory(
+                                s.getHistory().add(new VendorQuotationHistory(
                                         "Quotation Finalized",
                                         "FINAL",
                                         s.getQuotedAmount(),
@@ -208,5 +210,28 @@ public class VendorController {
         model.addAttribute("finalizedQuotations", vendorService.getFinalizedQuotations(id));
         model.addAttribute("vendorId", id);
         return "vendor/finalized-quotation";
+    }
+
+
+    @PostMapping("/logout")
+    public String logout(HttpServletResponse response) {
+
+        ResponseCookie deleteCookie = ResponseCookie.from(
+                        "FORGEHUB_ACCESS_TOKEN",
+                        ""
+                )
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(
+                "Set-Cookie",
+                deleteCookie.toString()
+        );
+
+        return "redirect:/";
     }
 }

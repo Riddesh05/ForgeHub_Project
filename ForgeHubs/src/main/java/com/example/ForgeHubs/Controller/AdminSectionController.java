@@ -7,8 +7,10 @@ import com.example.ForgeHubs.Service.RFQService;
 import com.example.ForgeHubs.Service.UserService;
 import com.example.ForgeHubs.Service.VendorService;
 import com.example.ForgeHubs.enums.RFQStatus;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -158,5 +160,29 @@ public class AdminSectionController {
         );
 
         return "admin/users";
+    }
+
+
+
+    @PostMapping("/logout")
+    public String logout(HttpServletResponse response) {
+
+        ResponseCookie deleteCookie = ResponseCookie.from(
+                        "FORGEHUB_ACCESS_TOKEN",
+                        ""
+                )
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(
+                "Set-Cookie",
+                deleteCookie.toString()
+        );
+
+        return "redirect:/";
     }
 }

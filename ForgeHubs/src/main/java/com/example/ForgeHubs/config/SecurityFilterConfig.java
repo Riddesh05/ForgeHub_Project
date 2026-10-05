@@ -47,9 +47,12 @@ public class SecurityFilterConfig {
 
                            //     "/css1/**",
                                 "/js/**",
+                                "/css/**",
                                 "/images/**"
                         ).permitAll()
 
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/vendor/**").hasRole("VENDOR")
                         .anyRequest().authenticated()
                 )
 
