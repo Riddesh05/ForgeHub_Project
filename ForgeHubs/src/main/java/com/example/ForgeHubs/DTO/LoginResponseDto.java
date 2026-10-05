@@ -16,4 +16,8 @@ public class LoginResponseDto {
     private String qrCode;
     private String accessToken;
     private String refreshToken;
+    private Long userId;
+    private String role;
+    private String name;
+    private String email;
 }
