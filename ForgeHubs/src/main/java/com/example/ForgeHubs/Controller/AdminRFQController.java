@@ -20,12 +20,9 @@ public class AdminRFQController {
 
     private final RFQService rfqService;
 
-    // Temporary admin ID until authentication branch is merged.
     private static final Long TEST_ADMIN_ID = 1L;
 
-    // =========================================================
     // ADD RFQ
-    // =========================================================
 
     @GetMapping("/add")
     public String showAddRFQ(Model model) {
@@ -36,9 +33,7 @@ public class AdminRFQController {
         return "admin/add-rfq";
     }
 
-    // =========================================================
-    // SAVE RFQ
-    // =========================================================
+
 
     @PostMapping("/save")
     public String saveRFQ(
@@ -63,10 +58,6 @@ public class AdminRFQController {
         }
     }
 
-    // =========================================================
-    // RFQ LIST
-    // =========================================================
-
     @GetMapping("/list")
     public String showRFQList(Model model) {
 
@@ -75,9 +66,7 @@ public class AdminRFQController {
         return "admin/rfq-list";
     }
 
-    // =========================================================
     // RFQ DETAILS FOR VIEW MODAL
-    // =========================================================
 
     @GetMapping("/details/{id}")
     @ResponseBody

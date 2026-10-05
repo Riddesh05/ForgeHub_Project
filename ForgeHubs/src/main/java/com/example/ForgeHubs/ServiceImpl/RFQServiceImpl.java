@@ -122,14 +122,10 @@ public class RFQServiceImpl implements RFQService {
         rfq.setIsDeleted(false);
 
 
-        // -----------------------------------------------------
         // CREATE ITEMS
-        // -----------------------------------------------------
-
         List<RFQItem> items = new ArrayList<>();
 
         if (request.getItems() != null) {
-
             int lineNo = 1;
 
             for (RFQItemRequest itemRequest
@@ -163,19 +159,10 @@ public class RFQServiceImpl implements RFQService {
         }
 
         rfq.setItems(items);
-
-
-        // -----------------------------------------------------
-        // SAVE RFQ
-        // -----------------------------------------------------
-
         RFQ savedRFQ = rfqRepository.save(rfq);
 
 
-        // -----------------------------------------------------
         // VENDOR ASSIGNMENT
-        // -----------------------------------------------------
-
         if (request.getVendorIds() != null) {
 
             for (Long vendorId
@@ -211,9 +198,7 @@ public class RFQServiceImpl implements RFQService {
     }
 
 
-    // =========================================================
     // READ FLOW: ENTITY -> RESPONSE DTO
-    // =========================================================
 
     @Override
     @Transactional
@@ -234,7 +219,6 @@ public class RFQServiceImpl implements RFQService {
         LocalDateTime now = LocalDateTime.now();
 
         for (RFQ rfq : rfqs) {
-
             if (rfq.getItems() != null) {
                 rfq.getItems().size();
             }
