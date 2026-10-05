@@ -3,10 +3,12 @@ package com.example.ForgeHubs.filter;
 import com.example.ForgeHubs.ServiceImpl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,15 +32,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String authorizationHeader = request.getHeader("Authorization");
+        String token = null;
 
-        if (authorizationHeader == null ||
-                !authorizationHeader.startsWith(BEARER)) {
+        if (authorizationHeader != null && authorizationHeader.startsWith(BEARER)) {
+            token = authorizationHeader.substring(BEARER.length());
+        } else if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("FORGEHUB_ACCESS_TOKEN".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
+        if (token == null || token.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String token = authorizationHeader.substring(BEARER.length());
 
         try {
 
@@ -50,8 +60,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
             String email = jwtService.extractSubject(token);
+            String role = jwtService.extractRole(token);
 
-            if (email == null || email.isBlank()) {
+            if (email == null || email.isBlank() || role == null || role.isBlank()) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -62,7 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                                 email,
                                 null,
-                                List.of()
+                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);

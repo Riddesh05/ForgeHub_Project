@@ -12,9 +12,6 @@ import dev.samstevens.totp.qr.QrData;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
-
-import org.antlr.v4.runtime.misc.Utils;
-
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;

@@ -7,13 +7,10 @@ import com.example.ForgeHubs.Entity.User;
 import com.example.ForgeHubs.Exception.BusinessException;
 import com.example.ForgeHubs.Repository.UserRepository;
 import com.example.ForgeHubs.Service.UserService;
-import com.example.ForgeHubs.config.PasswordEncoderConfig;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.ForgeHubs.enums.UserRole;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final PasswordEncoder  encoder;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
     private final UserRepository userRepository;
 
@@ -34,7 +31,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .name(userRequestDto.getName())
                 .email(userRequestDto.getEmail())
-                .password(encoder.encode(userRequestDto.getPassword()))
+                .password(passwordEncoder.encode(userRequestDto.getPassword()))
                 .role(userRequestDto.getRole())
                 .isFirstTimeLogin(true)
                 .twoFactorEnabled(false)
@@ -74,9 +71,19 @@ public class UserServiceImpl implements UserService {
 
         User user = mapper.map(request, User.class);
 
-        // Temporary password must be stored as hash
 
-        // IMPORTANT:
+        System.out.println("RAW PASSWORD: " + request.getPassword());
+
+        System.out.println(
+                "ENCODED PASSWORD: " +
+                        passwordEncoder.encode(request.getPassword())
+        );
+
+        // IMPORTANT: Store password as BCrypt hash
+        user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
+
         // Admin can ONLY create VENDOR
         user.setRole(UserRole.VENDOR);
 
@@ -87,9 +94,11 @@ public class UserServiceImpl implements UserService {
         // during first-time authentication flow.
         user.setSecretKey(null);
 
-        return mapper.map(userRepository.save(user), UserResponseDto.class);
+        return mapper.map(
+                userRepository.save(user),
+                UserResponseDto.class
+        );
     }
-
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers() {

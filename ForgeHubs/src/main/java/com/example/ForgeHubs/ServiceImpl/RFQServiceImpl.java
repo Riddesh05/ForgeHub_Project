@@ -80,7 +80,7 @@ public class RFQServiceImpl implements RFQService {
 
         User admin = userRepository.findById(adminUserId)
                 .orElseThrow(() ->
-                        new com.example.ForgeHubs.exception.ResourceNotFoundException(
+                        new ResourceNotFoundException(
                                 "Admin user was not found. Please sign in again."
                         )
                 );

@@ -3,7 +3,6 @@ package com.example.ForgeHubs.Service;
 
 import com.example.ForgeHubs.DTO.UserRequestDto;
 import com.example.ForgeHubs.DTO.UserResponseDto;
-import com.example.ForgeHubs.Entity.User;
 
 import java.util.List;
 

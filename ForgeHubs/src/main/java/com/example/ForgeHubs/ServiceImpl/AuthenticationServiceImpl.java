@@ -48,6 +48,46 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
         }
 
+        // Complete a pending first-time/recovery 2FA setup when an OTP is supplied.
+        // This keeps the existing recovery flow working without storing passwords in the browser.
+        if (requestDto.getAuthenticatorOtp() != null
+                && !requestDto.getAuthenticatorOtp().isBlank()
+                && user.getPendingTwoFactorSecret() != null) {
+
+            boolean valid = twoFactorService.verifyCode(
+                    user.getPendingTwoFactorSecret(),
+                    requestDto.getAuthenticatorOtp()
+            );
+
+            if (!valid) {
+                throw new AuthenticationException("Invalid OTP");
+            }
+
+            user.setTwoFactorSecret(user.getPendingTwoFactorSecret());
+            user.setPendingTwoFactorSecret(null);
+            user.setTwoFactorEnabled(true);
+            user.setFirstTimeLogin(false);
+            user.setRecoveryOtp(null);
+            user.setRecoveryOtpExpiry(null);
+            userRepo.save(user);
+
+            String accessToken = jwtService.generateToken(
+                    user.getEmail(),
+                    user.getRole().name()
+            );
+            String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+            return LoginResponseDto.builder()
+                    .requiresTwoFactorSetup(false)
+                    .requiresTwoFactor(false)
+                    .qrCode(null)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .userId(user.getUserId())
+                    .role(user.getRole().name())
+                    .build();
+        }
+
         if (!user.isTwoFactorEnabled()) {
 
             if (requestDto.getAuthenticatorOtp() == null ||
@@ -69,6 +109,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .qrCode(qrCode)
                         .accessToken(null)
                         .refreshToken(null)
+                        .userId(user.getUserId())
+                        .role(user.getRole().name())
+                        .name(user.getName())
+                        .email(user.getEmail())
                         .build();
             }
 
@@ -109,6 +153,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .qrCode(null)
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
+                    .userId(user.getUserId())
+                    .role(user.getRole().name())
                     .build();
         }
       if (requestDto.getAuthenticatorOtp()==null || requestDto.getAuthenticatorOtp().isBlank()) {
@@ -118,6 +164,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                   .qrCode(null)
                   .accessToken(null)
                   .refreshToken(null)
+                  .userId(user.getUserId())
+                  .role(user.getRole().name())
                   .build();
       }
       boolean valid = twoFactorService.verifyCode( user.getTwoFactorSecret(), requestDto.getAuthenticatorOtp());
@@ -134,6 +182,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .qrCode(null)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .userId(user.getUserId())
+                .role(user.getRole().name())
                 .build();
     }
 
@@ -240,6 +290,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .qrCode(qrCode)
                     .accessToken(null)
                     .refreshToken(null)
+                    .userId(user.getUserId())
+                    .role(user.getRole().name())
                     .build();
         }
 
@@ -278,6 +330,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .qrCode(null)
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
+                    .userId(user.getUserId())
+                    .role(user.getRole().name())
                     .build();
         }
 
@@ -314,6 +368,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .qrCode(null)
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
+                    .userId(user.getUserId())
+                    .role(user.getRole().name())
                     .build();
 
         } catch (Exception e) {

@@ -1,8 +1,8 @@
 package com.example.ForgeHubs.ServiceImpl;
 
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -62,6 +62,15 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public String extractRole(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
     }
 
     public String extractTokenType(String token) {
