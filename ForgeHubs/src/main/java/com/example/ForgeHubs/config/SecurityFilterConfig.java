@@ -45,7 +45,7 @@ public class SecurityFilterConfig {
                                 "/auth/2fa/recovery/send-otp",
                                 "/auth/2fa/recovery",
 
-                                "/css/**",
+                           //     "/css1/**",
                                 "/js/**",
                                 "/images/**"
                         ).permitAll()

@@ -1,0 +1,141 @@
+Index: ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.ForgeHubs.ServiceImpl;\r\n\r\nimport com.example.ForgeHubs.DTO.*;\r\nimport com.example.ForgeHubs.Entity.RFQ;\r\nimport com.example.ForgeHubs.Entity.RFQItem;\r\nimport com.example.ForgeHubs.Entity.RFQVendor;\r\nimport com.example.ForgeHubs.Entity.User;\r\nimport com.example.ForgeHubs.Exception.BusinessException;\r\nimport com.example.ForgeHubs.Exception.ResourceNotFoundException;\r\nimport com.example.ForgeHubs.Repository.RFQItemRepository;\r\nimport com.example.ForgeHubs.Repository.RFQRepository;\r\nimport com.example.ForgeHubs.Repository.RFQVendorRepository;\r\nimport com.example.ForgeHubs.Repository.UserRepository;\r\nimport com.example.ForgeHubs.Service.RFQService;\r\nimport com.example.ForgeHubs.enums.RFQStatus;\r\nimport com.example.ForgeHubs.enums.UserRole;\r\nimport jakarta.transaction.Transactional;\r\nimport lombok.RequiredArgsConstructor;\r\nimport org.modelmapper.ModelMapper;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.time.LocalDateTime;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n@Service\r\n@RequiredArgsConstructor\r\npublic class RFQServiceImpl implements RFQService {\r\n\r\n    private final RFQRepository rfqRepository;\r\n    private final RFQItemRepository rfqItemRepository;\r\n    private final RFQVendorRepository rfqVendorRepository;\r\n    private final UserRepository userRepository;\r\n    private final ModelMapper modelMapper;\r\n\r\n\r\n    // =========================================================\r\n    // RFQ NUMBER GENERATION\r\n    // =========================================================\r\n\r\n    @Override\r\n    public String generateRfqNo() {\r\n\r\n        long nextNumber = rfqRepository.count() + 1;\r\n\r\n        return String.format(\r\n                \"RFQ-%06d\",\r\n                nextNumber\r\n        );\r\n    }\r\n\r\n\r\n    // =========================================================\r\n    // INDENT NUMBER GENERATION\r\n    // =========================================================\r\n\r\n    @Override\r\n    public String generateIndentNo() {\r\n\r\n        long nextNumber = rfqRepository.count() + 1;\r\n\r\n        return String.format(\r\n                \"IND-%06d\",\r\n                nextNumber\r\n        );\r\n    }\r\n\r\n\r\n    // =========================================================\r\n    // SAVE RFQ\r\n    // =========================================================\r\n\r\n    @Override\r\n    @Transactional\r\n    public void saveRfq(\r\n            RFQCreateRequest request,\r\n            Long adminUserId,\r\n            boolean draft\r\n    ) {\r\n\r\n        User admin = userRepository.findById(adminUserId)\r\n                .orElseThrow(() ->\r\n                        new ResourceNotFoundException(\r\n                                \"Admin user was not found. Please sign in again.\"\r\n                        )\r\n                );\r\n\r\n        RFQ rfq = new RFQ();\r\n\r\n        rfq.setRfqNo(generateRfqNo());\r\n        rfq.setIndentNo(generateIndentNo());\r\n\r\n        rfq.setContactPerson(\r\n                request.getContactPerson()\r\n        );\r\n\r\n        rfq.setMobile(\r\n                request.getMobile()\r\n        );\r\n\r\n        if (request.getBidDate() != null) {\r\n\r\n            rfq.setBidDate(\r\n                    request.getBidDate().atStartOfDay()\r\n            );\r\n        }\r\n\r\n        if (request.getExpiryDateOfBid() != null) {\r\n\r\n            rfq.setExpiryDateOfBid(\r\n                    request.getExpiryDateOfBid().atStartOfDay()\r\n            );\r\n        }\r\n\r\n        rfq.setStatus(\r\n                draft\r\n                        ? RFQStatus.DRAFT\r\n                        : RFQStatus.OPEN\r\n        );\r\n\r\n        rfq.setUser(admin);\r\n        rfq.setIsDeleted(false);\r\n\r\n\r\n        // -----------------------------------------------------\r\n        // CREATE ITEMS\r\n        // -----------------------------------------------------\r\n\r\n        List<RFQItem> items = new ArrayList<>();\r\n\r\n        if (request.getItems() != null) {\r\n\r\n            int lineNo = 1;\r\n\r\n            for (RFQItemRequest itemRequest\r\n                    : request.getItems()) {\r\n\r\n                RFQItem item = modelMapper.map(itemRequest, RFQItem.class);\r\n\r\n                item.setRfq(rfq);\r\n\r\n                // Auto-generated fields\r\n                item.setRfqLineNo(lineNo);\r\n\r\n                item.setItemNo(\r\n                        String.format(\r\n                                \"ITEM-%06d\",\r\n                                lineNo\r\n                        )\r\n                );\r\n\r\n                item.setFactoryCode(\r\n                        String.format(\r\n                                \"FAC-%06d\",\r\n                                lineNo\r\n                        )\r\n                );\r\n\r\n                items.add(item);\r\n\r\n                lineNo++;\r\n            }\r\n        }\r\n\r\n        rfq.setItems(items);\r\n\r\n\r\n        // -----------------------------------------------------\r\n        // SAVE RFQ\r\n        // -----------------------------------------------------\r\n\r\n        RFQ savedRFQ = rfqRepository.save(rfq);\r\n\r\n\r\n        // -----------------------------------------------------\r\n        // VENDOR ASSIGNMENT\r\n        // -----------------------------------------------------\r\n\r\n        if (request.getVendorIds() != null) {\r\n\r\n            for (Long vendorId\r\n                    : request.getVendorIds()) {\r\n\r\n                User vendor = userRepository.findById(vendorId)\r\n                        .orElseThrow(() ->\r\n                                new ResourceNotFoundException(\r\n                                        \"Vendor was not found: \"\r\n                                                + vendorId\r\n                                )\r\n                        );\r\n\r\n                if (vendor.getRole() != UserRole.VENDOR) {\r\n\r\n                    throw new BusinessException(\r\n                            \"Selected user is not a vendor: \"\r\n                                    + vendor.getName()\r\n                    );\r\n                }\r\n\r\n                RFQVendor rfqVendor =\r\n                        new RFQVendor();\r\n\r\n                rfqVendor.setRfq(savedRFQ);\r\n                rfqVendor.setVendor(vendor);\r\n\r\n                rfqVendorRepository.save(\r\n                        rfqVendor\r\n                );\r\n            }\r\n        }\r\n    }\r\n\r\n\r\n    // =========================================================\r\n    // READ FLOW: ENTITY -> RESPONSE DTO\r\n    // =========================================================\r\n\r\n    @Override\r\n    @Transactional\r\n    public List<UserResponseDto> getAllVendors() {\r\n\r\n        return userRepository.findByRole(UserRole.VENDOR)\r\n                .stream()\r\n                .map(user -> modelMapper.map(user, UserResponseDto.class))\r\n                .toList();\r\n    }\r\n\r\n    @Override\r\n    @Transactional\r\n    public List<RFQResponseDto> getAllRFQs() {\r\n\r\n        List<RFQ> rfqs = rfqRepository.findAllByOrderByRfqIdDesc();\r\n\r\n        LocalDateTime now = LocalDateTime.now();\r\n\r\n        for (RFQ rfq : rfqs) {\r\n\r\n            if (rfq.getItems() != null) {\r\n                rfq.getItems().size();\r\n            }\r\n\r\n            if (rfq.getStatus() == RFQStatus.OPEN\r\n                    && rfq.getExpiryDateOfBid() != null\r\n                    && now.isAfter(rfq.getExpiryDateOfBid())) {\r\n\r\n                rfq.setStatus(RFQStatus.CLOSED);\r\n                rfqRepository.save(rfq);\r\n            }\r\n        }\r\n\r\n        return rfqs.stream()\r\n                .map(rfq -> modelMapper.map(rfq, RFQResponseDto.class))\r\n                .toList();\r\n    }\r\n\r\n    @Override\r\n    @Transactional\r\n    public RFQResponseDto getRFQById(Long id) {\r\n\r\n        RFQ rfq = rfqRepository\r\n                .findByRfqIdAndIsDeletedFalse(id)\r\n                .orElseThrow(() ->\r\n                        new BusinessException(\r\n                                \"RFQ not found with ID: \" + id\r\n                        )\r\n                );\r\n\r\n        if (rfq.getItems() != null) {\r\n            rfq.getItems().size();\r\n        }\r\n\r\n        return modelMapper.map(rfq, RFQResponseDto.class);\r\n    }\r\n\r\n    // =========================================================\r\n    // SOFT DELETE\r\n    // =========================================================\r\n\r\n    @Override\r\n    @Transactional\r\n    public void softDeleteRFQ(Long id) {\r\n\r\n        RFQ rfq = rfqRepository\r\n                .findByRfqIdAndIsDeletedFalse(id)\r\n                .orElseThrow(() ->\r\n                        new BusinessException(\r\n                                \"RFQ not found with ID: \"\r\n                                        + id\r\n                        )\r\n                );\r\n\r\n        rfq.setIsDeleted(true);\r\n\r\n        rfqRepository.save(rfq);\r\n    }\r\n\r\n\r\n    // =========================================================\r\n    // UPDATE RFQ HEADER ONLY\r\n    // =========================================================\r\n\r\n    @Override\r\n    @Transactional\r\n    public void updateRFQ(\r\n            Long id,\r\n            RFQCreateRequest request,\r\n            boolean draft\r\n    ) {\r\n\r\n        RFQ rfq = rfqRepository\r\n                .findByRfqIdAndIsDeletedFalse(id)\r\n                .orElseThrow(() ->\r\n                        new BusinessException(\r\n                                \"RFQ not found with ID: \"\r\n                                        + id\r\n                        )\r\n                );\r\n\r\n\r\n        // -----------------------------------------------------\r\n        // UPDATE ONLY RFQ HEADER\r\n        // -----------------------------------------------------\r\n\r\n        rfq.setContactPerson(\r\n                request.getContactPerson()\r\n        );\r\n\r\n        rfq.setMobile(\r\n                request.getMobile()\r\n        );\r\n\r\n        if (request.getBidDate() != null) {\r\n\r\n            rfq.setBidDate(\r\n                    request.getBidDate().atStartOfDay()\r\n            );\r\n        }\r\n\r\n        if (request.getExpiryDateOfBid() != null) {\r\n\r\n            rfq.setExpiryDateOfBid(\r\n                    request.getExpiryDateOfBid().atStartOfDay()\r\n            );\r\n        }\r\n\r\n\r\n        /*\r\n         * IMPORTANT:\r\n         *\r\n         * Do NOT clear RFQ items here.\r\n         *\r\n         * Outer \"Edit RFQ\" is only for:\r\n         *\r\n         * Contact Person\r\n         * Mobile\r\n         * Bid Start Date\r\n         * Bid End Date\r\n         *\r\n         * Existing products must remain unchanged.\r\n         */\r\n\r\n\r\n        /*\r\n         * Do NOT delete/recreate vendors here either.\r\n         *\r\n         * Existing vendor assignments remain unchanged.\r\n         */\r\n\r\n\r\n        /*\r\n         * Preserve existing RFQ status.\r\n         *\r\n         * Editing the header should NOT automatically\r\n         * change CLOSED / REOPENED / DRAFT etc.\r\n         */\r\n        rfqRepository.save(rfq);\r\n    }\r\n\r\n\r\n    // =========================================================\r\n    // UPDATE SINGLE RFQ ITEM\r\n    // =========================================================\r\n\r\n    @Override\r\n    @Transactional\r\n    public void updateRFQItem(RFQItemUpdateRequest request) {\r\n\r\n        RFQItem item = rfqItemRepository\r\n                .findById(request.getItemId())\r\n                .orElseThrow(() ->\r\n                        new BusinessException(\r\n                                \"RFQ Item not found with ID: \"\r\n                                        + request.getItemId()\r\n                        )\r\n                );\r\n\r\n\r\n        /*\r\n         * Only editable product fields\r\n         * are updated.\r\n         */\r\n\r\n        item.setItemName(request.getItemName());\r\n\r\n        item.setReqQty(request.getReqQty());\r\n\r\n        item.setUom(request.getUom());\r\n\r\n        item.setReqDeliveryDate(request.getReqDeliveryDate());\r\n\r\n        item.setDeliveryLocation(request.getDeliveryLocation());\r\n\r\n        item.setDescription(request.getDescription());\r\n\r\n\r\n        /*\r\n         * DO NOT modify:\r\n         *\r\n         * ItemId\r\n         * RFQ\r\n         * RFQLineNo\r\n         * ItemNo\r\n         * FactoryCode\r\n         */\r\n\r\n\r\n        rfqItemRepository.save(item);\r\n    }\r\n\r\n\r\n    // =========================================================\r\n    // OPEN RFQ TO REBID\r\n    // =========================================================\r\n\r\n    @Override\r\n    @Transactional\r\n    public void openToRebid(Long id) {\r\n\r\n        RFQ rfq = rfqRepository\r\n                .findById(id)\r\n                .orElseThrow(() ->\r\n                        new BusinessException(\r\n                                \"RFQ not found with ID: \"\r\n                                        + id\r\n                        )\r\n                );\r\n\r\n        if (Boolean.TRUE.equals(\r\n                rfq.getIsDeleted()\r\n        )) {\r\n\r\n            throw new BusinessException(\r\n                    \"Inactive RFQ cannot be opened for rebid.\"\r\n            );\r\n        }\r\n\r\n        if (rfq.getStatus()\r\n                != RFQStatus.CLOSED) {\r\n\r\n            throw new BusinessException(\r\n                    \"Only CLOSED RFQ can be opened for rebid.\"\r\n            );\r\n        }\r\n\r\n        rfq.setStatus(\r\n                RFQStatus.REOPENED\r\n        );\r\n\r\n        rfqRepository.save(rfq);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java b/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java
+--- a/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java	(revision 2de378675a2de7545d82711751bcc52f7472f3bb)
++++ b/ForgeHubs/src/main/java/com/example/ForgeHubs/ServiceImpl/RFQServiceImpl.java	(date 1791137099049)
+@@ -66,9 +66,6 @@
+     }
+ 
+ 
+-    // =========================================================
+-    // SAVE RFQ
+-    // =========================================================
+ 
+     @Override
+     @Transactional
+@@ -122,12 +119,8 @@
+         rfq.setIsDeleted(false);
+ 
+ 
+-        // -----------------------------------------------------
+         // CREATE ITEMS
+-        // -----------------------------------------------------
+-
+         List<RFQItem> items = new ArrayList<>();
+-
+         if (request.getItems() != null) {
+ 
+             int lineNo = 1;
+@@ -139,7 +132,6 @@
+ 
+                 item.setRfq(rfq);
+ 
+-                // Auto-generated fields
+                 item.setRfqLineNo(lineNo);
+ 
+                 item.setItemNo(
+@@ -163,18 +155,9 @@
+         }
+ 
+         rfq.setItems(items);
+-
+-
+-        // -----------------------------------------------------
+-        // SAVE RFQ
+-        // -----------------------------------------------------
+-
+         RFQ savedRFQ = rfqRepository.save(rfq);
+ 
+ 
+-        // -----------------------------------------------------
+-        // VENDOR ASSIGNMENT
+-        // -----------------------------------------------------
+ 
+         if (request.getVendorIds() != null) {
+ 
+Index: ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.ForgeHubs.Controller;\r\n\r\nimport com.example.ForgeHubs.DTO.RFQCreateRequest;\r\nimport com.example.ForgeHubs.DTO.RFQItemUpdateRequest;\r\nimport com.example.ForgeHubs.DTO.RFQResponseDto;\r\nimport com.example.ForgeHubs.Service.RFQService;\r\nimport lombok.RequiredArgsConstructor;\r\nimport lombok.extern.slf4j.Slf4j;\r\nimport org.springframework.http.ResponseEntity;\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.ui.Model;\r\nimport org.springframework.web.bind.annotation.*;\r\n\r\n\r\n@Slf4j\r\n@Controller\r\n@RequestMapping(\"/admin/rfq\")\r\n@RequiredArgsConstructor\r\npublic class AdminRFQController {\r\n\r\n    private final RFQService rfqService;\r\n\r\n    // Temporary admin ID until authentication branch is merged.\r\n    private static final Long TEST_ADMIN_ID = 1L;\r\n\r\n    // =========================================================\r\n    // ADD RFQ\r\n    // =========================================================\r\n\r\n    @GetMapping(\"/add\")\r\n    public String showAddRFQ(Model model) {\r\n\r\n        model.addAttribute(\"rfqRequest\", new RFQCreateRequest());\r\n        model.addAttribute(\"vendors\", rfqService.getAllVendors());\r\n\r\n        return \"admin/add-rfq\";\r\n    }\r\n\r\n    // =========================================================\r\n    // SAVE RFQ\r\n    // =========================================================\r\n\r\n    @PostMapping(\"/save\")\r\n    public String saveRFQ(\r\n            @ModelAttribute(\"rfqRequest\") RFQCreateRequest request,\r\n            @RequestParam(name = \"action\", defaultValue = \"submit\") String action,\r\n            Model model\r\n    ) {\r\n\r\n        boolean draft = action.equalsIgnoreCase(\"draft\");\r\n\r\n        try {\r\n            rfqService.saveRfq(request, TEST_ADMIN_ID, draft);\r\n            return \"redirect:/admin/rfq/list\";\r\n\r\n        } catch (Exception e) {\r\n            log.error(\"Request failed unexpectedly\", e);\r\n\r\n            model.addAttribute(\"error\", e.getMessage());\r\n            model.addAttribute(\"vendors\", rfqService.getAllVendors());\r\n\r\n            return \"admin/add-rfq\";\r\n        }\r\n    }\r\n\r\n    // =========================================================\r\n    // RFQ LIST\r\n    // =========================================================\r\n\r\n    @GetMapping(\"/list\")\r\n    public String showRFQList(Model model) {\r\n\r\n        model.addAttribute(\"rfqs\", rfqService.getAllRFQs());\r\n\r\n        return \"admin/rfq-list\";\r\n    }\r\n\r\n    // =========================================================\r\n    // RFQ DETAILS FOR VIEW MODAL\r\n    // =========================================================\r\n\r\n    @GetMapping(\"/details/{id}\")\r\n    @ResponseBody\r\n    public RFQResponseDto getRFQDetails(@PathVariable Long id) {\r\n        return rfqService.getRFQById(id);\r\n    }\r\n\r\n    // =========================================================\r\n    // UPDATE RFQ HEADER\r\n    // =========================================================\r\n\r\n    @PostMapping(\"/update/{id}\")\r\n    public String updateRFQ(\r\n            @PathVariable Long id,\r\n            @ModelAttribute RFQCreateRequest request,\r\n            @RequestParam(name = \"action\", defaultValue = \"submit\") String action\r\n    ) {\r\n\r\n        boolean draft = action.equalsIgnoreCase(\"draft\");\r\n\r\n        rfqService.updateRFQ(id, request, draft);\r\n\r\n        return \"redirect:/admin/rfq/list\";\r\n    }\r\n\r\n    // =========================================================\r\n    // UPDATE SINGLE RFQ ITEM\r\n    // =========================================================\r\n\r\n    @PostMapping(\"/item/update\")\r\n    @ResponseBody\r\n    public ResponseEntity<String> updateRFQItem(\r\n            @ModelAttribute RFQItemUpdateRequest request\r\n    ) {\r\n\r\n        rfqService.updateRFQItem(request);\r\n\r\n        return ResponseEntity.ok(\"success\");\r\n    }\r\n\r\n    // =========================================================\r\n    // SOFT DELETE\r\n    // =========================================================\r\n\r\n    @PostMapping(\"/delete/{id}\")\r\n    public String deleteRFQ(@PathVariable Long id) {\r\n\r\n        rfqService.softDeleteRFQ(id);\r\n\r\n        return \"redirect:/admin/rfq/list\";\r\n    }\r\n\r\n    // =========================================================\r\n    // OPEN TO REBID\r\n    // =========================================================\r\n\r\n    @PostMapping(\"/rebid/{id}\")\r\n    public String openToRebid(@PathVariable Long id) {\r\n\r\n        rfqService.openToRebid(id);\r\n\r\n        return \"redirect:/admin/rfq/list\";\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java b/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java
+--- a/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java	(revision 2de378675a2de7545d82711751bcc52f7472f3bb)
++++ b/ForgeHubs/src/main/java/com/example/ForgeHubs/Controller/AdminRFQController.java	(date 1791138290101)
+@@ -23,10 +23,7 @@
+     // Temporary admin ID until authentication branch is merged.
+     private static final Long TEST_ADMIN_ID = 1L;
+ 
+-    // =========================================================
+     // ADD RFQ
+-    // =========================================================
+-
+     @GetMapping("/add")
+     public String showAddRFQ(Model model) {
+ 
+@@ -36,9 +33,7 @@
+         return "admin/add-rfq";
+     }
+ 
+-    // =========================================================
+     // SAVE RFQ
+-    // =========================================================
+ 
+     @PostMapping("/save")
+     public String saveRFQ(
+@@ -55,17 +50,13 @@
+ 
+         } catch (Exception e) {
+             log.error("Request failed unexpectedly", e);
+-
+             model.addAttribute("error", e.getMessage());
+             model.addAttribute("vendors", rfqService.getAllVendors());
+-
+             return "admin/add-rfq";
+         }
+     }
+ 
+-    // =========================================================
+-    // RFQ LIST
+-    // =========================================================
++
+ 
+     @GetMapping("/list")
+     public String showRFQList(Model model) {
+@@ -75,9 +66,7 @@
+         return "admin/rfq-list";
+     }
+ 
+-    // =========================================================
+     // RFQ DETAILS FOR VIEW MODAL
+-    // =========================================================
+ 
+     @GetMapping("/details/{id}")
+     @ResponseBody
+@@ -85,9 +74,8 @@
+         return rfqService.getRFQById(id);
+     }
+ 
+-    // =========================================================
+     // UPDATE RFQ HEADER
+-    // =========================================================
++
+ 
+     @PostMapping("/update/{id}")
+     public String updateRFQ(
+@@ -97,9 +85,7 @@
+     ) {
+ 
+         boolean draft = action.equalsIgnoreCase("draft");
+-
+         rfqService.updateRFQ(id, request, draft);
+-
+         return "redirect:/admin/rfq/list";
+     }
+ 
