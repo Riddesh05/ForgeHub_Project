@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
 async function verifySetup() {
 
     const email = sessionStorage.getItem("email");
-    const password = sessionStorage.getItem("password");
     const otp = document.getElementById("otp").value.trim();
 
     const errorMessage = document.getElementById("errorMessage");
@@ -51,7 +50,6 @@ async function verifySetup() {
 
             body: JSON.stringify({
                 email: email,
-                password: password,
                 authenticatorOtp: otp
             })
         });
@@ -68,25 +66,47 @@ async function verifySetup() {
             return;
         }
 
-        if (data.accessToken) {
+if (data.accessToken) {
 
-            sessionStorage.setItem(
-                "accessToken",
-                data.accessToken
-            );
+    sessionStorage.setItem(
+        "accessToken",
+        data.accessToken
+    );
 
-            sessionStorage.setItem(
-                "refreshToken",
-                data.refreshToken
-            );
+    sessionStorage.setItem(
+        "refreshToken",
+        data.refreshToken
+    );
 
-            sessionStorage.removeItem("qrCode");
+    sessionStorage.setItem(
+        "role",
+        data.role
+    );
 
-            window.location.href = "/dashboard";
+    sessionStorage.setItem(
+        "userId",
+        data.userId
+    );
 
-            return;
-        }
+    sessionStorage.removeItem("qrCode");
 
+    if (data.role === "ADMIN") {
+
+        window.location.href = "/admin/dashboard";
+
+    } else if (data.role === "VENDOR") {
+
+        window.location.href =
+            "/vendor/open-rfq?vendorId=" +
+            encodeURIComponent(data.userId);
+
+    } else {
+
+        window.location.href = "/dashboard";
+    }
+
+    return;
+}
         errorMessage.textContent =
             "Unexpected response from server.";
 

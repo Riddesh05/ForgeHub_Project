@@ -82,8 +82,18 @@ async function login() {
                 "refreshToken",
                 data.refreshToken
             );
+            sessionStorage.setItem("role", data.role);
+            sessionStorage.setItem("userId", data.userId);
+            sessionStorage.setItem("name", data.name);
+            sessionStorage.setItem("email", data.email);
 
-            window.location.href = "/dashboard";
+            if (data.role === "ADMIN") {
+                window.location.href = "/admin/dashboard";
+            } else if (data.role === "VENDOR") {
+                window.location.href = "/vendor/dashboard?vendorId=" + encodeURIComponent(data.userId);
+            } else {
+                window.location.href = "/dashboard";
+            }
 
             return;
         }

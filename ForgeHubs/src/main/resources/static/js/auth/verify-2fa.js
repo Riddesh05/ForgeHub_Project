@@ -75,8 +75,16 @@ async function verifyOtp() {
             );
 
             sessionStorage.removeItem("email");
+            sessionStorage.setItem("role", data.role);
+            sessionStorage.setItem("userId", data.userId);
 
-            window.location.href = "/dashboard";
+            if (data.role === "ADMIN") {
+                window.location.href = "/admin/dashboard";
+            } else if (data.role === "VENDOR") {
+                window.location.href = "/vendor/dashboard?vendorId=" + encodeURIComponent(data.userId);
+            } else {
+                window.location.href = "/dashboard";
+            }
 
             return;
         }
