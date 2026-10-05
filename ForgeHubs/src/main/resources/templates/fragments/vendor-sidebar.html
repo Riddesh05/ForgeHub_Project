@@ -30,11 +30,28 @@
     </nav>
 
     <div class="sidebar-footer">
+
         <div class="admin-avatar">V</div>
-        <div>
-            <div class="footer-name" th:text="${vendor.name}">Vendor</div>
-            <div class="footer-role">Vendor Panel</div>
+
+        <div class="flex-grow-1">
+            <div class="footer-name" th:text="${vendor.name}">
+                Vendor
+            </div>
+
+            <div class="footer-role">
+                Vendor Panel
+            </div>
         </div>
+
+        <form th:action="@{/vendor/logout}" method="post">
+            <button
+                    type="submit"
+                    class="btn btn-link text-danger p-0"
+                    title="Logout">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </form>
+
     </div>
 </aside>
 </body>

@@ -50,11 +50,22 @@
     </nav>
 
     <div class="sidebar-footer">
+
         <div class="admin-avatar">A</div>
-        <div>
+
+        <div class="flex-grow-1">
             <div class="footer-name">Administrator</div>
             <div class="footer-role">Admin</div>
         </div>
+
+        <form th:action="@{/admin/logout}" method="post" class="ms-2">
+            <button type="submit"
+                    class="btn btn-link text-danger p-0"
+                    title="Logout">
+                <i class="bi bi-box-arrow-right fs-5"></i>
+            </button>
+        </form>
+
     </div>
 
 </aside>
